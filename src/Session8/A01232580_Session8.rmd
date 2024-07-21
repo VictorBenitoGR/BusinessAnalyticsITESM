@@ -1,0 +1,297 @@
+---
+title: "Session 8"
+date: "2024-07-18"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+    code_download: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(visdat)
+library(knitr)
+```
+
+# <span style="color:#61003c;">**Import datasets and present a glimpse, names and header for the four of them. You must have: crunchy_sales_USA,  crunchy_sales_MX, crunchy_wages_USA and crunchy_wages_MX.**</span> 
+
+```{r}
+crunchy_sales_MX <- read_excel("CrunchyMX.xlsx", sheet = "Sales")
+crunchy_wages_MX <- read_excel("CrunchyMX.xlsx", sheet = "Wages")
+```
+
+```{r}
+glimpse(crunchy_sales_MX)
+```
+
+```{r}
+names(crunchy_sales_MX)
+```
+
+```{r}
+head(crunchy_sales_MX)
+```
+
+```{r}
+glimpse(crunchy_wages_MX)
+```
+
+```{r}
+names(crunchy_wages_MX)
+```
+
+```{r}
+head(crunchy_wages_MX)
+```
+
+```{r}
+crunchy_sales_USA <- read_excel("CrunchyUSA.xlsx", sheet = "Sales")
+crunchy_wages_USA <- read_excel("CrunchyUSA.xlsx", sheet = "Wages")
+```
+
+```{r}
+glimpse(crunchy_sales_USA)
+```
+
+```{r}
+names(crunchy_sales_USA)
+```
+
+```{r}
+head(crunchy_sales_USA)
+```
+
+```{r}
+glimpse(crunchy_wages_USA)
+```
+
+```{r}
+names(crunchy_wages_USA)
+```
+
+```{r}
+head(crunchy_wages_USA)
+```
+
+# <span style="color:#61003c;">**Start working with Crunchy_sales_MX. Use vis_miss to identify NA’s.**</span>
+
+```{r}
+vis_miss(crunchy_sales_MX)
+```
+
+## Look for outliers with a boxplot for numerical variables, replace NA’s with mean if you do not have outliers, replace it with median otherwise. 
+
+```{r}
+# Boxplot of CrujiCos, SaladoCos, and BBQCos
+boxplot(crunchy_sales_MX$CrujiCos, main = "CrujiCos", col = "lightblue")
+boxplot(crunchy_sales_MX$SaladoCos, main = "SaladoCos", col = "lightblue")
+boxplot(crunchy_sales_MX$BBQCos, main = "BBQCos", col = "lightblue")
+```
+
+```{r}
+# Replace NA's with mean
+crunchy_sales_MX <- crunchy_sales_MX %>%
+  mutate(CrujiCos = ifelse(is.na(CrujiCos), mean(CrujiCos, na.rm = TRUE), CrujiCos),
+         SaladoCos = ifelse(is.na(SaladoCos), mean(SaladoCos, na.rm = TRUE), SaladoCos),
+         BBQCos = ifelse(is.na(BBQCos), mean(BBQCos, na.rm = TRUE), BBQCos))
+```
+
+```{r}
+vis_miss(crunchy_sales_MX)
+```
+
+## Fill the spaces for month with fill(dataset,.direction=”up or down") Column: Month
+
+```{r}
+crunchy_sales_MX <- crunchy_sales_MX %>%
+  fill(Month, .direction = "down")
+head(crunchy_sales_MX)
+```
+
+## Run again the vis_miss at the end to verify you don’t have any NA.
+
+```{r}
+vis_miss(crunchy_sales_MX)
+```
+
+# <span style="color:#61003c;">**Rename the columns to match the Crunchy_sales_USA names. Show the header of the object.**</span>
+
+```{r}
+colnames(crunchy_sales_MX) <- c(
+  "Row", "Month", "Region", "CrunchyCo", "SpicyCo", "SaltCo", "BBQCo", "SalsaCo"
+)
+names(crunchy_sales_MX)
+```
+
+# <span style="color:#61003c;">**Add a column ”Country” and write Mexico in every observation. Show the header of the object. **</span>
+
+```{r}
+crunchy_sales_MX <- crunchy_sales_MX %>%
+  mutate(Country = "Mexico")
+head(crunchy_sales_MX)
+```
+
+### <span style="color:#61003c;">**5. Repeat steps 2 and 4  for Crunchy_sales_USA (for step 4, write USA).**</span>
+
+```{r}
+vis_miss(crunchy_sales_USA)
+```
+
+```{r}
+boxplot(crunchy_sales_USA$CrunchyCo, main = "CrunchyCo", col = "lightblue")
+boxplot(crunchy_sales_USA$SaltCo, main = "SaltCo", col = "lightblue")
+boxplot(crunchy_sales_USA$BBQCo, main = "BBQCo", col = "lightblue")
+```
+
+```{r}
+crunchy_sales_USA <- crunchy_sales_USA %>%
+  mutate(CrunchyCo = ifelse(is.na(CrunchyCo), mean(CrunchyCo, na.rm = TRUE), CrunchyCo),
+         SaltCo = ifelse(is.na(SaltCo), mean(SaltCo, na.rm = TRUE), SaltCo),
+         BBQCo = ifelse(is.na(BBQCo), mean(BBQCo, na.rm = TRUE), BBQCo))
+```
+
+```{r}
+vis_miss(crunchy_sales_USA)
+```
+
+```{r}
+crunchy_sales_USA <- crunchy_sales_USA %>%
+  fill(Month, .direction = "down")
+
+head(crunchy_sales_USA)
+```
+
+```{r}
+crunchy_sales_USA <- crunchy_sales_USA %>%
+  mutate(Country = "USA")
+
+head(crunchy_sales_USA)
+```
+
+```{r}
+vis_miss(crunchy_sales_USA)
+```
+
+# <span style="color:#61003c;">**Merge with rbind Crunchy_sales_USA and Crunchy_sales_MX and name it crunchy_sales.**</span>
+
+```{r}
+crunchy_sales <- rbind(crunchy_sales_USA, crunchy_sales_MX)
+```
+
+# <span style="color:#61003c;">**For crunchy_wages_USA and crunchy_wages_MX:**</span>
+
+## In variable “wage”, remove the observation that has text using subset and  change it to numeric.
+
+```{r}
+names(crunchy_wages_MX)
+# [1] "Number of workers" "Wage (USD)"
+```
+
+```{r}
+names(crunchy_wages_USA)
+# [1] "Number of workers" "Wage (USD)"
+```
+
+```{r}
+# Más de $62,000 (crunchy_wages_MX) to $62000
+crunchy_wages_MX <- crunchy_wages_MX %>%
+  subset(!grepl("Más de", `Wage (USD)`)) %>%
+  mutate(`Wage (USD)` = as.numeric(gsub("\\$", "", `Wage (USD)`)))
+
+class(crunchy_wages_MX$`Wage (USD)`)
+```
+
+```{r}
+# More than $41,000 (crunchy_wages_USA) to $41000
+crunchy_wages_USA <- crunchy_wages_USA %>%
+  subset(!grepl("More than", `Wage (USD)`)) %>%
+  mutate(`Wage (USD)` = as.numeric(gsub("\\$", "", `Wage (USD)`)))
+
+class(crunchy_wages_USA$`Wage (USD)`)
+```
+
+## Add a column “country” as in step 4.
+
+```{r}
+crunchy_wages_MX <- crunchy_wages_MX %>%
+  mutate(Country = "Mexico")
+head(crunchy_wages_MX)
+```
+
+```{r}
+crunchy_wages_USA <- crunchy_wages_USA %>%
+  mutate(Country = "USA")
+head(crunchy_wages_USA)
+```
+
+## In crunchy_MX_wages mutate the variable Wage (USD) to change the currency to USD, use 16.84MXN -> 1 USD.
+
+```{r}
+crunchy_wages_MX <- crunchy_wages_MX %>%
+  mutate(`Wage (USD)` = `Wage (USD)` / 16.84)
+head(crunchy_wages_MX)
+```
+
+## In crunchy_USA_wages mutate to round up to an integer the variable Number of workers. Hint: decide if you use ceiling or floor function. 
+
+```{r}
+# If the decimal part is greater than 0.5, round up, otherwise, round down.
+crunchy_wages_USA <- crunchy_wages_USA %>%
+  mutate(
+    `Number of workers` = ifelse(
+      `Number of workers` - floor(`Number of workers`) > 0.5,
+      ceiling(`Number of workers`), floor(`Number of workers`)
+    )
+  )
+```
+
+## Merge both datasets into a single one: crunchy_wages.
+
+```{r}
+crunchy_wages <- rbind(crunchy_wages_USA, crunchy_wages_MX)
+head(crunchy_wages)
+```
+
+## For both variables, change the name to avoid white spaces.
+
+```{r}
+colnames(crunchy_wages) <- c("NumberOfWorkers", "WageUSD", "Country")
+names(crunchy_wages)
+```
+
+# <span style="color:#61003c;">**Use kable (library: knitr) to present the 2 final datasets.**</span>
+
+```{r}
+kable(crunchy_sales)
+```
+
+```{r}
+kable(crunchy_wages)
+```
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "A01232580_Session8.rmd",
+#   output_format = rmarkdown::pdf_document(),
+#   output_dir = "./docs/"
+# )
+
+# rmarkdown::render(
+#   "./src/Session8/A01232580_Session8.rmd",
+#   output_format = "html_document",
+#   output_dir = "./docs/"
+# )
+```

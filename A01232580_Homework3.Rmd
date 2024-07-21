@@ -1,0 +1,307 @@
+---
+title: "Homework 03"
+author: "Victor Benito Garcia Rocha"
+date: "7/14/2022"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+---
+
+```{r setup, echo=FALSE, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Context
+
+We are going to work with a “Mental Health in Tech Survey” dataset, a series of 2016 survey responses aiming to capture mental health statuses and workplace attitudes among tech employees.
+
+```{r}
+library(tidyverse) #for data manipulation
+library(stringr) #string characters
+```
+
+# <span style="color:#0000FF;">Step 1</span>
+
+Import the information in the file "mental_health_in_tech_2016.csv" into a data frame. Review your dataset
+
+```{r}
+mental_health_in_tech <- read_csv("mental_health_in_tech_2016-1.csv")
+```
+
+```{r echo=FALSE}
+colnames(mental_health_in_tech)
+head(mental_health_in_tech)
+#  [1] "Observation"     "Self_employed"   "Employees"       "Tech_company"
+#  [5] "IT_role"         "Health_benefits" "Age"             "Gender"
+#  [9] "Country_birth"   "Country_work"    "Work_remotely"
+```
+
+# <span style="color:#0000FF;">Step 2</span>
+
+Check if there are string inconsistencies (typos, capitalization errors, etc), and correct them. Hint: Focus on the Employees and Gender variables 
+
+```{r}
+#Employees variable (how many employees work in the company)
+unique(mental_health_in_tech$Employees)
+```
+
+```{r}
+mental_health_in_tech$Employees <- mental_health_in_tech$Employees %>%
+  str_replace("01-may", "1-5") %>%
+  str_replace("jun-25", "6-25")
+unique(mental_health_in_tech$Employees)
+```
+
+```{r}
+#Gender variable (Gender of the employee)
+unique(mental_health_in_tech$Gender)
+```
+
+```{r}
+male_labels <- c("Male", "male", "M", "m", "MALE")
+female_labels <- c("Female", "female", "F", "f")
+
+mental_health_in_tech <- mental_health_in_tech %>%
+  mutate(Gender = case_when(
+    Gender %in% male_labels ~ "Male",
+    Gender %in% female_labels ~ "Female",
+    TRUE ~ NA_character_
+))
+```
+
+```{r}
+unique(mental_health_in_tech$Gender)
+```
+
+# <span style="color:#0000FF;">Step 3</span>
+
+Are ther some missing values? Replace them (you can use the mean, median, mode or other value) In any case, you have to justify your decision.
+
+```{r}
+# Print the columns that have NAs
+print(colnames(mental_health_in_tech)[colSums(is.na(mental_health_in_tech)) > 0])
+```
+
+- Tech_company variable has values like 1 and 0, it's not really possible to infer it precisely neither make an average/mode since it's a binary variable. Since this is a survey, we can assume that the missing values are from people who don't work in a tech company (I assume that 0 means "No").
+
+```{r}
+unique(mental_health_in_tech$Tech_company)
+```
+
+```{r}
+mental_health_in_tech$Tech_company <- mental_health_in_tech$Tech_company %>%
+  replace_na(0)
+```
+
+Now the problem is that it's numeric, but it should be a factor.
+
+```{r}
+class(mental_health_in_tech$Tech_company)
+```
+
+```{r}
+mental_health_in_tech$Tech_company <- as.factor(mental_health_in_tech$Tech_company)
+class(mental_health_in_tech$Tech_company)
+```
+
+- Let's print the columns Tech_company and IT_Role when the IT_Role is NA. We can see that when the IT_Role is NA, the Tech_company is 0, so it's safe to assume that the intended value is "No" (0). We also change the data type to factor.
+
+```{r}
+unique(mental_health_in_tech$IT_role)
+```
+
+```{r}
+na <- mental_health_in_tech %>%
+  filter(is.na(IT_role)) %>%
+  select(Tech_company, IT_role)
+```
+
+```{r}
+mental_health_in_tech$IT_role <- mental_health_in_tech$IT_role %>%
+  replace_na(0)
+```
+
+```{r}
+class(mental_health_in_tech$IT_role)
+```
+
+```{r}
+mental_health_in_tech$IT_role <- as.factor(mental_health_in_tech$IT_role)
+class(mental_health_in_tech$IT_role)
+```
+
+- There's no reliable way to infer the Gender of the person. Since data integrity is fundamental and it afffects only one row, we can drop it. We should also change the data type to factor.
+
+```{r}
+mental_health_in_tech %>%
+  filter(is.na(Gender))
+```
+
+```{r}
+mental_health_in_tech <- mental_health_in_tech %>%
+  drop_na()
+```
+
+```{r}
+mental_health_in_tech$Gender <- as.factor(mental_health_in_tech$Gender)
+class(mental_health_in_tech$Gender)
+```
+
+# <span style="color:#0000FF;">Step 4</span>
+
+Look for outliers in the Age variable and remove them.
+
+```{r}
+boxplot(mental_health_in_tech$Age)
+```
+
+```{r}
+Q1 <- quantile(mental_health_in_tech$Age, 0.25)
+Q3 <- quantile(mental_health_in_tech$Age, 0.75)
+IQR <- Q3 - Q1
+
+lower_bound <- Q1 - 1.5 * IQR
+upper_bound <- Q3 + 1.5 * IQR
+
+mental_health_in_tech <- mental_health_in_tech %>%
+  filter(Age >= lower_bound & Age <= upper_bound)
+
+# There are still 3 outliers left when recalculated.
+# Since the instruction is to remove them, another iteration is needed.
+
+Q1 <- quantile(mental_health_in_tech$Age, 0.25)
+Q3 <- quantile(mental_health_in_tech$Age, 0.75)
+IQR <- Q3 - Q1
+
+lower_bound <- Q1 - 1.5 * IQR
+upper_bound <- Q3 + 1.5 * IQR
+
+mental_health_in_tech <- mental_health_in_tech %>%
+  filter(Age >= lower_bound & Age <= upper_bound)
+```
+
+```{r}
+boxplot(mental_health_in_tech$Age)
+```
+
+# <span style="color:#0000FF;">Step 5</span>
+
+Review if the data type assigned to each variable is adecuate. If not, change it.(Numbers must be integers or doubles, some characters must be factors, etc)
+
+- Observation: Numeric, it's an ID, so it should be character.
+
+```{r}
+class(mental_health_in_tech$Observation)
+```
+
+```{r}
+mental_health_in_tech$Observation <- as.character(mental_health_in_tech$Observation)
+class(mental_health_in_tech$Observation)
+```
+
+- Self_employed: Numeric, it's a binary variable, so it should be a factor.
+
+```{r}
+class(mental_health_in_tech$Self_employed)
+```
+
+```{r}
+mental_health_in_tech$Self_employed <- as.factor(mental_health_in_tech$Self_employed)
+class(mental_health_in_tech$Self_employed)
+```
+
+- Employees: Character, it's a range of employees, so it should be a factor.
+
+```{r}
+class(mental_health_in_tech$Employees)
+```
+
+```{r}
+mental_health_in_tech$Employees <- as.factor(mental_health_in_tech$Employees)
+class(mental_health_in_tech$Employees)
+```
+
+- Tech_company: We already changed it to a factor.
+
+```{r}
+class(mental_health_in_tech$Tech_company)
+```
+
+- IT_role: We already changed it to a factor.
+
+```{r}
+class(mental_health_in_tech$IT_role)
+```
+
+- Health_benefits: Numeric, its a list so it should be a factor.
+
+```{r}
+class(mental_health_in_tech$Health_benefits)
+```
+
+```{r}
+mental_health_in_tech$Health_benefits <- as.factor(
+  mental_health_in_tech$Health_benefits
+)
+class(mental_health_in_tech$Health_benefits)
+```
+
+- Age: Numeric, which it's okay but we can change it to integer.
+
+```{r}
+class(mental_health_in_tech$Age)
+```
+
+```{r}
+mental_health_in_tech$Age <- as.integer(mental_health_in_tech$Age)
+class(mental_health_in_tech$Age)
+```
+
+- Gender: We already changed it to a factor.
+
+```{r}
+class(mental_health_in_tech$Gender)
+```
+
+- Country_birth: Character, it's a country, so it should be a factor.
+
+```{r}
+class(mental_health_in_tech$Country_birth)
+```
+
+```{r}
+mental_health_in_tech$Country_birth <- as.factor(mental_health_in_tech$Country_birth)
+class(mental_health_in_tech$Country_birth)
+```
+
+- Work_remotely: Character, it's a list so it should be a factor.
+
+```{r}
+class(mental_health_in_tech$Work_remotely)
+```
+
+```{r}
+mental_health_in_tech$Work_remotely <- as.factor(mental_health_in_tech$Work_remotely)
+class(mental_health_in_tech$Work_remotely)
+```
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "A01232580_Homework3.Rmd",
+#   output_format = rmarkdown::pdf_document(),
+#   output_dir = "./docs/"
+# )
+
+# rmarkdown::render(
+#   "./src/A01232580_Homework3.Rmd",
+#   output_format = "html_document",
+#   output_dir = "./docs/"
+# )
+```
