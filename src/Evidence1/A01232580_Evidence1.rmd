@@ -1,0 +1,765 @@
+---
+title: "Evidence 1: R Markdown file"
+date: "2024-07-18"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+    code_download: TRUE
+---
+
+# **An International Endeavor**
+
+- **The Company**
+
+Crunchy is a multinational company with a presence in over 40 countries. Executives in the company consider that it has continued growing in recent decades due to its marketing techniques, adaptation to markets, and a reasonably competitive price-quality relationship. During its expansion, the company opened its first production branch in Mexico; this branch has now completed its first year of operations in the country; the first annual Sales and Significant Statistics (SSS) report is being prepared.
+
+Crunchy's main product is potato chips, offered in 40 different variations, depending on each country's trends and preferences. The company is new to the Mexican market, so the executives in the company implemented a cautious approach, due to the high competition: Crunchy in Mexico only offers internationally recognized products, resulting in a limited variety of flavors; another decision in this sense was that only one size is available in Mexico.
+
+To enter the Mexican markets, the company decided to change the name of most of its products to make them more appealing. Therefore, even though the chips follow the same recipe, their logo pursue a different marketing position; also, the colors of the plastic bag are different from those used in Europe or the United States. As part of the adapting process in the Mexican market, the company offers specific packaging in México.
+
+As part of the Mexican branch of Crunchy, an Analytical Team (AT) was created to provide the company’s executives with useful information for the decision-making process.
+
+The AT team considers that the first SSS report in the Mexican branch would help them to assess the extent of product penetration in the country and to compare salaries in México versus other companies’ salaries worldwide.
+
+Also, the AT team´s perspective is that the aforementioned report could be helpful to compare sales with similar markets and to understand whether a significant presence has been achieved in the Mexican market. Based on the information provided by the AT team’s evaluation, executives in the company could reach decisions such as increasing the number of products, modifying salaries, establishing a second branch in another state of the country, and determining whether to continue with growth or to adapt or adjust a product to boost sales
+
+- **An Analysis for the Decision-Making Process**
+
+To start a useful comparative analysis, the AT team considers that they need both worldwide historical sales data and historical sales data from the Mexican market. From the SSS first annual report of the branch in México, the AT team found the worldwide information that is available in the given datasets. Also, the AT team found the historical sales data from the Mexican market in the SSS first annual report.
+
+After reviewing both files, the AT team found some inconsistencies and differences with both databases. For instance, in the worldwide database, the potato chips names appear as "Crunchy", but in Mexico this product is sold under the name “CrujiCos” Similarly, the spicy chips labeled as “SpicyCo” in the worldwide database are presented as “PicanCos” in Mexico. Other examples: The “SaltCo” is presented as “SaladoCos”, the “BBQCo” is called “BBQCos”, and finally, “SalsaCo” is known as “SalsaCos” in Mexico.
+
+The AT team considers that another challenge in this comparison is the currencies difference, where the worldwide database is in USD, and the Mexican database is in Mexican pesos. The AT team concluded that, to ensure consistency and facilitate sharing information with the foreign headquarters, all the results need to be presented in USD, using the average of the previous month as the exchange rate.
+
+Another finding of the AT team is that both databases are divided into three regions in each country, with each region representing around 33% of the population, thus, there is a need to find a meaningful comparison. In addition, they found that both databases include monthly sales readings, necessitating thorough analysis to determine the correct method of comparing regions across different countries is evidently required.
+
+The AT team considers that the process of the analysis needs a count of employee salaries, which should be treated separately from the analysis of the potato chip sales; their opinion is that salary data adds extra context, about the workforce.
+
+- **The Expected AT Team´s Report**
+
+The AT team will prepare a report that considers the information they found, and which is mentioned above. In a first meeting, they will present this report to the executives in the Mexican branch; then, they will present this report to the corporate executives in Crunchy.
+
+The AT team´s final report is expected to handle missing data, errors in titles, currency exchange, and other issues. The analysis must include relevant statistical data, charts, and a clear and precise presentation of the information. This report must also include comparisons between regions, products, and months. 
+
+This final report must include linear graphs to look for trends in sales, present the information with the USA names, compare the wages, an analysis about the number of workers and the relevant information that results of the analysis of the data. The AT team plans to prepare a summary of the findings and a set of recommendations.
+
+Local and corporate executives in Crunchy expect that the conclusions provided by the AT team will allow them to understand the penetration of the company in the Mexican market. They trust that the information provided by the AT team will enable a clear visualization of the direction for the company's next steps in the country.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(visdat)
+library(knitr)
+```
+
+# <span style="color:#61003c;">**Import datasets and present a glimpse, names and header for the four of them. You must have: crunchy_sales_USA,  crunchy_sales_MX, crunchy_wages_USA and crunchy_wages_MX.**</span> 
+
+```{r}
+crunchy_sales_MX <- read_excel("CrunchyMX.xlsx", sheet = "Sales")
+crunchy_wages_MX <- read_excel("CrunchyMX.xlsx", sheet = "Wages")
+```
+
+```{r}
+glimpse(crunchy_sales_MX)
+# Rows: 36
+# Columns: 8
+# $ Row       1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1
+# $ Month     "Enero", NA, NA, "Febrero", NA, NA, "Marzo", NA, NA, "Abril"
+# $ Region    "Región 1", "Región 2", "Región 3", "Región 1", "Región 2", 
+# $ CrujiCos  4497, 3747, 6664, 6620, 4514, 7194, 8865, 8934, 9031, 9737, 
+# $ PicanCos  4448, 6385, 5239, 7928, 7650, 12709, 10368, 12499, 11857, 10
+# $ SaladoCos NA, NA, 3518, 4012, 5599, 4550, 4762, 6086, 4698, 4503, 5276
+# $ BBQCos    NA, NA, 1737, 3739, 3028, 2844, 3798, 1198, 2432, 2400, 1515
+# $ SalsaCos  5949, 7781, 7322, 7401, 5771, 6597, 8494, 8791, 6566, 8848,
+```
+
+```{r}
+names(crunchy_sales_MX)
+```
+
+```{r}
+head(crunchy_sales_MX)
+```
+
+```{r}
+glimpse(crunchy_wages_MX)
+# Rows: 20
+# Columns: 2
+# $ `Number of workers` 54, 59, 65, 80, 84, 93, 111, 137, 132, 121, 109, 9
+# $ `Wage (USD)`        "5000", "8000", "11000", "14000", "17000", "20000"
+```
+
+```{r}
+names(crunchy_wages_MX)
+```
+
+```{r}
+head(crunchy_wages_MX)
+```
+
+```{r}
+crunchy_sales_USA <- read_excel("CrunchyUSA.xlsx", sheet = "Sales")
+crunchy_wages_USA <- read_excel("CrunchyUSA.xlsx", sheet = "Wages")
+```
+
+```{r}
+glimpse(crunchy_sales_USA)
+# Rows: 36
+# Columns: 8
+# $ Row       1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 1
+# $ Month     "January", NA, NA, "February", NA, NA, "March", NA, NA, "Apr
+# $ Region    "Region 1", "Region 2", "Region 3", "Region 1", "Region 2", 
+# $ CrunchyCo 76497, 66952, 65904, 80363, 78209, 75641, 72684, 64834, 7844
+# $ SpicyCo   85593, 112069, 104656, 90866, 71201, 76728, 90539, 77073, 89
+# $ SaltCo    88029, 68042, 48051, 67132, 63599, 91169, 69360, 90898, 8679
+# $ BBQCo     41790, 37184, 15998, 45087, 52459, 48019, 45939, 46842, 2046
+# $ SalsaCo   60876, 12250, 44202, 61019, 46366, 30994, 35893, 52129, 4860
+```
+
+```{r}
+names(crunchy_sales_USA)
+```
+
+```{r}
+head(crunchy_sales_USA)
+```
+
+```{r}
+glimpse(crunchy_wages_USA)
+# Rows: 40
+# Columns: 2
+# $ `Number of workers` 119.00, 119.84, 137.14, 150.65, 206.00, 249.35, 26
+# $ `Wage (USD)`        "2000", "3000", "4000", "5000", "6000", "7000", "8
+```
+
+```{r}
+names(crunchy_wages_USA)
+```
+
+```{r}
+head(crunchy_wages_USA)
+```
+
+# <span style="color:#61003c;">**Start working with Crunchy_sales_MX. Use vis_miss to identify NA’s.**</span>
+
+```{r}
+vis_miss(crunchy_sales_MX)
+```
+
+## Look for outliers with a boxplot for numerical variables, replace NA’s with mean if you do not have outliers, replace it with median otherwise. 
+
+```{r}
+# Boxplot of CrujiCos, SaladoCos, and BBQCos
+boxplot(crunchy_sales_MX$CrujiCos, main = "CrujiCos", col = "lightblue")
+boxplot(crunchy_sales_MX$SaladoCos, main = "SaladoCos", col = "lightblue")
+boxplot(crunchy_sales_MX$BBQCos, main = "BBQCos", col = "lightblue")
+```
+
+```{r}
+# Replace NA's with mean
+crunchy_sales_MX <- crunchy_sales_MX %>%
+  mutate(CrujiCos = ifelse(is.na(CrujiCos), mean(CrujiCos, na.rm = TRUE), CrujiCos),
+         SaladoCos = ifelse(is.na(SaladoCos), mean(SaladoCos, na.rm = TRUE), SaladoCos),
+         BBQCos = ifelse(is.na(BBQCos), mean(BBQCos, na.rm = TRUE), BBQCos))
+```
+
+```{r}
+vis_miss(crunchy_sales_MX)
+```
+
+## Fill the spaces for month with fill(dataset,.direction=”up or down") Column: Month
+
+```{r}
+crunchy_sales_MX <- crunchy_sales_MX %>%
+  fill(Month, .direction = "down")
+head(crunchy_sales_MX)
+```
+
+## Run again the vis_miss at the end to verify you don’t have any NA.
+
+```{r}
+vis_miss(crunchy_sales_MX)
+```
+
+# <span style="color:#61003c;">**Rename the columns to match the Crunchy_sales_USA names. Show the header of the object.**</span>
+
+```{r}
+colnames(crunchy_sales_MX) <- c(
+  "Row", "Month", "Region", "CrunchyCo", "SpicyCo", "SaltCo", "BBQCo", "SalsaCo"
+)
+names(crunchy_sales_MX)
+```
+
+# <span style="color:#61003c;">**Add a column ”Country” and write Mexico in every observation. Show the header of the object. **</span>
+
+```{r}
+crunchy_sales_MX <- crunchy_sales_MX %>%
+  mutate(Country = "Mexico")
+head(crunchy_sales_MX)
+```
+
+### <span style="color:#61003c;">**5. Repeat steps 2 and 4  for Crunchy_sales_USA (for step 4, write USA).**</span>
+
+```{r}
+vis_miss(crunchy_sales_USA)
+```
+
+```{r}
+boxplot(crunchy_sales_USA$CrunchyCo, main = "CrunchyCo", col = "lightblue")
+boxplot(crunchy_sales_USA$SaltCo, main = "SaltCo", col = "lightblue")
+boxplot(crunchy_sales_USA$BBQCo, main = "BBQCo", col = "lightblue")
+```
+
+```{r}
+crunchy_sales_USA <- crunchy_sales_USA %>%
+  mutate(CrunchyCo = ifelse(is.na(CrunchyCo), mean(CrunchyCo, na.rm = TRUE), CrunchyCo),
+         SaltCo = ifelse(is.na(SaltCo), mean(SaltCo, na.rm = TRUE), SaltCo),
+         BBQCo = ifelse(is.na(BBQCo), mean(BBQCo, na.rm = TRUE), BBQCo))
+```
+
+```{r}
+vis_miss(crunchy_sales_USA)
+```
+
+```{r}
+crunchy_sales_USA <- crunchy_sales_USA %>%
+  fill(Month, .direction = "down")
+
+head(crunchy_sales_USA)
+```
+
+```{r}
+crunchy_sales_USA <- crunchy_sales_USA %>%
+  mutate(Country = "USA")
+
+head(crunchy_sales_USA)
+```
+
+```{r}
+vis_miss(crunchy_sales_USA)
+```
+
+# <span style="color:#61003c;">**Merge with rbind Crunchy_sales_USA and Crunchy_sales_MX and name it crunchy_sales.**</span>
+
+```{r}
+crunchy_sales <- rbind(crunchy_sales_USA, crunchy_sales_MX)
+```
+
+# <span style="color:#61003c;">**For crunchy_wages_USA and crunchy_wages_MX:**</span>
+
+## In variable “wage”, remove the observation that has text using subset and  change it to numeric.
+
+```{r}
+names(crunchy_wages_MX)
+# [1] "Number of workers" "Wage (USD)"
+```
+
+```{r}
+names(crunchy_wages_USA)
+# [1] "Number of workers" "Wage (USD)"
+```
+
+```{r}
+# Más de $62,000 (crunchy_wages_MX) to $62000
+crunchy_wages_MX <- crunchy_wages_MX %>%
+  subset(!grepl("Más de", `Wage (USD)`)) %>%
+  mutate(`Wage (USD)` = as.numeric(gsub("\\$", "", `Wage (USD)`)))
+
+class(crunchy_wages_MX$`Wage (USD)`)
+```
+
+```{r}
+# More than $41,000 (crunchy_wages_USA) to $41000
+crunchy_wages_USA <- crunchy_wages_USA %>%
+  subset(!grepl("More than", `Wage (USD)`)) %>%
+  mutate(`Wage (USD)` = as.numeric(gsub("\\$", "", `Wage (USD)`)))
+
+class(crunchy_wages_USA$`Wage (USD)`)
+```
+
+## Add a column “country” as in step 4.
+
+```{r}
+crunchy_wages_MX <- crunchy_wages_MX %>%
+  mutate(Country = "Mexico")
+head(crunchy_wages_MX)
+```
+
+```{r}
+crunchy_wages_USA <- crunchy_wages_USA %>%
+  mutate(Country = "USA")
+head(crunchy_wages_USA)
+```
+
+## In crunchy_MX_wages mutate the variable Wage (USD) to change the currency to USD, use 16.84MXN -> 1 USD.
+
+```{r}
+crunchy_wages_MX <- crunchy_wages_MX %>%
+  mutate(`Wage (USD)` = `Wage (USD)` / 16.84)
+head(crunchy_wages_MX)
+```
+
+## In crunchy_USA_wages mutate to round up to an integer the variable Number of workers. Hint: decide if you use ceiling or floor function. 
+
+```{r}
+# If the decimal part is greater than 0.5, round up, otherwise, round down.
+crunchy_wages_USA <- crunchy_wages_USA %>%
+  mutate(
+    `Number of workers` = ifelse(
+      `Number of workers` - floor(`Number of workers`) > 0.5,
+      ceiling(`Number of workers`), floor(`Number of workers`)
+    )
+  )
+```
+
+## Merge both datasets into a single one: crunchy_wages.
+
+```{r}
+crunchy_wages <- rbind(crunchy_wages_USA, crunchy_wages_MX)
+head(crunchy_wages)
+```
+
+## For both variables, change the name to avoid white spaces.
+
+```{r}
+colnames(crunchy_wages) <- c("Number_of_workers", "Wage_USD", "Country")
+names(crunchy_wages)
+```
+
+# <span style="color:#61003c;">**Use kable (library: knitr) to present the 2 final datasets.**</span>
+
+```{r}
+kable(crunchy_sales)
+# | Row|Month     |Region   | CrunchyCo| SpicyCo|    SaltCo|     BBQCo| SalsaCo|Country |
+# |---:|:---------|:--------|---------:|-------:|---------:|---------:|-------:|:-------|
+# |   1|January   |Region 1 |   76497.0|   85593| 88029.000| 41790.000|   60876|USA     |
+# |   2|January   |Region 2 |   66952.0|  112069| 68042.000| 37184.000|   12250|USA     |
+# |   3|January   |Region 3 |   65904.0|  104656| 48051.000| 15998.000|   44202|USA     |
+# |   4|February  |Region 1 |   80363.0|   90866| 67132.000| 45087.000|   61019|USA     |
+# |   5|February  |Region 2 |   78209.0|   71201| 63599.000| 52459.000|   46366|USA     |
+# |   6|February  |Region 3 |   75641.0|   76728| 91169.000| 48019.000|   30994|USA     |
+# |   7|March     |Region 1 |   72684.0|   90539| 69360.000| 45939.000|   35893|USA     |
+# |   8|March     |Region 2 |   64834.0|   77073| 90898.000| 46842.000|   52129|USA     |
+# |   9|March     |Region 3 |   78440.0|   89854| 86796.000| 20461.000|   48605|USA     |
+# |  10|April     |Region 1 |   74063.0|   71805| 88949.000| 19583.000|   33381|USA     |
+# |  11|April     |Region 2 |   74448.0|  100577| 75921.000| 38690.000|   54289|USA     |
+# |  12|April     |Region 3 |   73019.0|   93874| 84979.000| 47549.000|   28199|USA     |
+# |  13|May       |Region 1 |   70877.0|   56348| 62715.000| 45774.000|   64792|USA     |
+# |  14|May       |Region 2 |   76505.0|   96605| 73193.000| 20703.000|   58823|USA     |
+# |  15|May       |Region 3 |   70786.0|   70298| 53469.000| 23468.000|   56690|USA     |
+# |  16|June      |Region 1 |   68731.0|   88487| 84647.000| 15483.000|   30450|USA     |
+# |  17|June      |Region 2 |   87401.0|   97837| 61247.000| 17039.000|   59483|USA     |
+# |  18|June      |Region 3 |   60170.0|   89749| 51565.000| 23259.000|   32548|USA     |
+# |  19|July      |Region 1 |  104366.0|   95453| 79448.000| 57316.000|   72632|USA     |
+# |  20|July      |Region 2 |   73836.0|   83132| 79442.000| 50682.000|   52753|USA     |
+# |  21|July      |Region 3 |   65365.0|   80376| 77116.000| 45865.000|   61760|USA     |
+# |  22|August    |Region 1 |   67729.0|   83380| 71410.000| 36286.000|   49887|USA     |
+# |  23|August    |Region 2 |   87446.0|   84722| 76771.000| 49160.000|   34802|USA     |
+# |  24|August    |Region 3 |   73736.0|   90044| 60226.000| 45055.000|   61617|USA     |
+# |  25|September |Region 1 |   79918.0|   76043| 64726.000| 16583.000|   59877|USA     |
+# |  26|September |Region 2 |   60267.0|   81413| 55212.000| 17077.000|   54254|USA     |
+# |  27|September |Region 3 |   77082.0|   71842| 88443.000| 35599.000|   39005|USA     |
+# |  28|October   |Region 1 |   67819.0|   76047| 79623.000| 36450.000|   47325|USA     |
+# |  29|October   |Region 2 |   85006.0|   95734| 78737.000| 40765.000|   64132|USA     |
+# |  30|October   |Region 3 |   65046.0|   83199| 57880.000| 16663.000|   29919|USA     |
+# |  31|November  |Region 1 |   53170.0|   77088| 77385.000| 50628.000|   38318|USA     |
+# |  32|November  |Region 2 |   60375.0|   82929| 68213.000| 37051.000|   35759|USA     |
+# |  33|November  |Region 3 |   72808.0|   72544| 60135.000| 27156.000|   36809|USA     |
+# |  34|December  |Region 1 |   85599.0|   90252| 60874.000| 25704.000|   59500|USA     |
+# |  35|December  |Region 2 |   75562.0|   79915| 72167.000| 22513.000|   61963|USA     |
+# |  36|December  |Region 3 |  105287.0|  108613| 78974.000| 47853.000|   46513|USA     |
+# |   1|Enero     |Región 1 |    4497.0|    4448|  5266.882|  2814.765|    5949|Mexico  |
+# |   2|Enero     |Región 2 |    3747.0|    6385|  5266.882|  2814.765|    7781|Mexico  |
+# |   3|Enero     |Región 3 |    6664.0|    5239|  3518.000|  1737.000|    7322|Mexico  |
+# |   4|Febrero   |Región 1 |    6620.0|    7928|  4012.000|  3739.000|    7401|Mexico  |
+# |   5|Febrero   |Región 2 |    4514.0|    7650|  5599.000|  3028.000|    5771|Mexico  |
+# |   6|Febrero   |Región 3 |    7194.0|   12709|  4550.000|  2844.000|    6597|Mexico  |
+# |   7|Marzo     |Región 1 |    8865.0|   10368|  4762.000|  3798.000|    8494|Mexico  |
+# |   8|Marzo     |Región 2 |    8934.0|   12499|  6086.000|  1198.000|    8791|Mexico  |
+# |   9|Marzo     |Región 3 |    9031.0|   11857|  4698.000|  2432.000|    6566|Mexico  |
+# |  10|Abril     |Región 1 |    9737.0|   10220|  4503.000|  2400.000|    8848|Mexico  |
+# |  11|Abril     |Región 2 |    8668.0|    7715|  5276.000|  1515.000|    6620|Mexico  |
+# |  12|Abril     |Región 3 |    8817.0|   12912|  5641.000|  1124.000|    8805|Mexico  |
+# |  13|Mayo      |Región 1 |    9236.0|    7842|  5508.000|  2800.000|    7724|Mexico  |
+# |  14|Mayo      |Región 2 |    6641.0|    7820|  5672.000|  4416.000|   10466|Mexico  |
+# |  15|Mayo      |Región 3 |    7793.0|    9900|  6342.000|  3115.000|    5963|Mexico  |
+# |  16|Junio     |Región 1 |    9889.0|    9924|  4568.000|  2016.000|    6888|Mexico  |
+# |  17|Junio     |Región 2 |    5398.0|   11319|  4244.000|  3067.000|    7950|Mexico  |
+# |  18|Junio     |Región 3 |    9695.0|    8009|  6705.000|  1755.000|    8443|Mexico  |
+# |  19|Julio     |Región 1 |    6313.0|    9960|  6966.000|  1920.000|    8223|Mexico  |
+# |  20|Julio     |Región 2 |    5582.0|   11993|  4893.000|  3865.000|    7793|Mexico  |
+# |  21|Julio     |Región 3 |    7302.0|   10150|  6836.000|  1906.000|   10270|Mexico  |
+# |  22|Agosto    |Región 1 |    8185.0|    9947|  4445.000|  1150.000|    9900|Mexico  |
+# |  23|Agosto    |Región 2 |    5548.0|   12749|  4389.000|  4134.000|   11026|Mexico  |
+# |  24|Agosto    |Región 3 |    6897.0|   13750|  7588.000|  3774.000|    6084|Mexico  |
+# |  25|Sepbre    |Región 1 |    5841.0|    7400|  6371.000|  4064.000|    8049|Mexico  |
+# |  26|Sepbre    |Región 2 |    8402.0|    7167|  6028.000|  2293.000|    5095|Mexico  |
+# |  27|Sepbre    |Región 3 |    9865.0|    9831|  4740.000|  3920.000|    7201|Mexico  |
+# |  28|Octubre   |Región 1 |    7930.0|   12669|  5131.000|  4592.000|    6020|Mexico  |
+# |  29|Octubre   |Región 2 |    8245.0|   10172|  4380.000|  2882.000|   10117|Mexico  |
+# |  30|Octubre   |Región 3 |    8070.0|    9575|  6895.000|  4966.000|    7845|Mexico  |
+# |  31|Noviembre |Región 1 |    7276.0|   12121|  4372.000|  4147.000|    9339|Mexico  |
+# |  32|Noviembre |Región 2 |    8939.0|   11889|  4472.000|  3593.000|    7701|Mexico  |
+# |  33|Noviembre |Región 3 |    7784.0|    8481|  4410.000|  2181.000|    5881|Mexico  |
+# |  34|Diciembre |Región 1 |    9017.0|    8998|  5030.000|  1461.000|    5694|Mexico  |
+# |  35|Diciembre |Región 2 |    9032.0|   11410|  4115.000|  1870.000|    8332|Mexico  |
+# |  36|Diciembre |Región 3 |    7604.8|   12166|  6329.000|  2000.000|    7037|Mexico  |
+```
+
+```{r}
+kable(crunchy_wages)
+# | NumberOfWorkers|    WageUSD|Country |
+# |---------------:|----------:|:-------|
+# |             119|  2000.0000|USA     |
+# |             120|  3000.0000|USA     |
+# |             137|  4000.0000|USA     |
+# |             151|  5000.0000|USA     |
+# |             206|  6000.0000|USA     |
+# |             249|  7000.0000|USA     |
+# |             262|  8000.0000|USA     |
+# |             304|  9000.0000|USA     |
+# |             314| 10000.0000|USA     |
+# |             324| 11000.0000|USA     |
+# |             354| 12000.0000|USA     |
+# |             407| 13000.0000|USA     |
+# |             432| 14000.0000|USA     |
+# |             477| 15000.0000|USA     |
+# |             493| 16000.0000|USA     |
+# |             517| 17000.0000|USA     |
+# |             530| 18000.0000|USA     |
+# |             588| 19000.0000|USA     |
+# |             618| 20000.0000|USA     |
+# |             599| 21000.0000|USA     |
+# |             558| 22000.0000|USA     |
+# |             537| 23000.0000|USA     |
+# |             524| 24000.0000|USA     |
+# |             482| 25000.0000|USA     |
+# |             464| 26000.0000|USA     |
+# |             427| 27000.0000|USA     |
+# |             391| 28000.0000|USA     |
+# |             346| 29000.0000|USA     |
+# |             284| 30000.0000|USA     |
+# |             245| 31000.0000|USA     |
+# |             233| 32000.0000|USA     |
+# |             200| 33000.0000|USA     |
+# |             191| 34000.0000|USA     |
+# |             165| 35000.0000|USA     |
+# |             156| 36000.0000|USA     |
+# |             140| 37000.0000|USA     |
+# |             129| 38000.0000|USA     |
+# |             117| 39000.0000|USA     |
+# |             113| 40000.0000|USA     |
+# |              54|   296.9121|Mexico  |
+# |              59|   475.0594|Mexico  |
+# |              65|   653.2067|Mexico  |
+# |              80|   831.3539|Mexico  |
+# |              84|  1009.5012|Mexico  |
+# |              93|  1187.6485|Mexico  |
+# |             111|  1365.7957|Mexico  |
+# |             137|  1543.9430|Mexico  |
+# |             132|  1722.0903|Mexico  |
+# |             121|  1900.2375|Mexico  |
+# |             109|  2078.3848|Mexico  |
+# |              99|  2256.5321|Mexico  |
+# |              93|  2434.6793|Mexico  |
+# |              77|  2612.8266|Mexico  |
+# |              66|  2790.9739|Mexico  |
+# |              61|  2969.1211|Mexico  |
+# |              58|  3147.2684|Mexico  |
+# |              52|  3325.4157|Mexico  |
+# |              37|  3503.5629|Mexico  |
+```
+
+# <span style="color:#61003c;">**Change the name to the crunchy_wages variables (in case you din’t before) and replace Global by USA in both data sets (crunchy_wages and crunchy_sales).**</span>
+
+```{r}
+names(crunchy_wages)
+```
+
+```{r}
+crunchy_wages <- crunchy_wages %>% 
+  mutate(Country=replace(Country,Country=="USA","Global"))
+
+crunchy_sales <- crunchy_sales %>%
+  mutate(Country=replace(Country,Country=="USA","Global"))
+```
+
+# <span style="color:#61003c;">**Get the names for the levels of the Month variable in crunchy_sales. You need to change everything to english language. Verify at the end (with function levels) that this was solved.**</span>
+
+```{r}
+levels(as.factor(crunchy_sales$Month))
+```
+
+```{r}
+crunchy_sales <- crunchy_sales %>% 
+  mutate(Month=replace(Month,Month=="Enero","January")) %>% 
+  mutate(Month=replace(Month,Month=="Febrero","February")) %>% 
+  mutate(Month=replace(Month,Month=="Marzo","March")) %>% 
+  mutate(Month=replace(Month,Month=="Abril","April")) %>% 
+  mutate(Month=replace(Month,Month=="Mayo","May")) %>% 
+  mutate(Month=replace(Month,Month=="Junio","June")) %>% 
+  mutate(Month=replace(Month,Month=="Julio","July")) %>% 
+  mutate(Month=replace(Month,Month=="Agosto","August")) %>% 
+  mutate(Month=replace(Month,Month=="Sepbre","September")) %>% 
+  mutate(Month=replace(Month,Month=="Octubre","October")) %>% 
+  mutate(Month=replace(Month,Month=="Noviembre","November")) %>% 
+  mutate(Month=replace(Month,Month=="Diciembre","December"))
+  
+levels(as.factor(crunchy_sales$Month))
+```
+
+# <span style="color:#61003c;">**Replace “Región 1” by “Region 1” and so on in crunchy_sales.**</span>
+
+```{r}
+crunchy_sales <- crunchy_sales %>% 
+  mutate(Region=replace(Region,Region=="Región 1","Region 1")) %>% 
+  mutate(Region=replace(Region,Region=="Región 2","Region 2")) %>% 
+  mutate(Region=replace(Region,Region=="Región 3","Region 3"))
+```
+
+# <span style="color:#61003c;">**Create the following graph for Global wages. Change the name of the axis labels to Number of workers and Wage (USD).**</span>
+
+```{r}
+crunchy_wages %>% 
+  filter(Country=="Global") %>% 
+  ggplot(aes(x=Wage_USD,y=Number_of_workers)) +
+  geom_line(aes(col=Country)) +
+  theme_minimal()
+```
+
+# <span style="color:#61003c;">**Create the previous graph now for Mexico wages. Change the name of the axis labels to Number of workers and Wage (USD).**</span>
+
+```{r}
+crunchy_wages %>% 
+  filter(Country == "Mexico") %>% 
+  ggplot(aes(x = Wage_USD, y = Number_of_workers)) +
+  geom_line(aes(col=Country)) +
+  theme_minimal()
+```
+
+Question to be answered in your final report (Part III of the problem situation) will be marked on blue.
+What distribution seems to have each one of the graphs? Do you notice skewness? What recommendation
+would you provide related to the wages of Crunchy Co. 
+
+# <span style="color:#61003c;">**Build the following table, it shows the total sales for every product by country. What conclusion would you get from it? Do the products perform the same in Mexico compared to other countries?**</span>
+
+```{r}
+glimpse(crunchy_sales_MX)
+```
+
+```{r}
+sales_by_country <- crunchy_sales %>% 
+  select(-Row) %>% 
+  group_by(Country) %>% 
+  summarise_if(is.numeric,(sum)) 
+kable(sales_by_country,format.args = list(big.mark = ","))
+# |Country |   CrunchyCo|   SpicyCo|      SaltCo|       BBQCo|   SalsaCo|
+# |:-------|-----------:|---------:|-----------:|-----------:|---------:|
+# |Global  | 2,675,941.0| 3,076,885| 2,596,543.0| 1,263,733.0| 1,717,814|
+# |Mexico  |   273,772.8|   355,172|   189,607.8|   101,331.5|   277,986|
+```
+
+# <span style="color:#61003c;">**Build the following graph that represents the previous table. Use minimal theme. In your final report, it must have an interpretation.**</span>
+
+```{r}
+total_sales <- crunchy_sales %>% 
+  select(-c(Row, Month, Region))
+
+total_sales_long <- total_sales %>%
+  pivot_longer(CrunchyCo:SalsaCo, names_to = "product", values_to = "sales") 
+
+options(scipen=999)
+
+ggplot(total_sales_long, aes(x=product, y=sales, fill=Country)) +
+  geom_col() +
+  facet_wrap(~Country) +
+  scale_y_continuous(breaks=seq(0, 3100000, 250000)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+# <span style="color:#61003c;">**Build the following dodge bar plot. In your final report, it must have an interpretation. Which one seems to be better to represent the dataset?**</span>
+
+```{r}
+ggplot(total_sales_long,aes(x=product,y=sales,fill=Country)) +
+  stat_summary(geom="col",fun="sum",position="dodge") +
+  scale_y_continuous(breaks=seq(0,3100000,250000)) +
+  theme_minimal()
+```
+
+# <span style="color:#61003c;">**Now, let’s focus on the Mexican market. Build the following table. What can you say about the performance of each region/product?**</span>
+
+```{r}
+regions_mexico <- crunchy_sales %>% 
+  select(-Row) %>% 
+  filter(Country=="Mexico") %>% 
+  group_by(Region) %>% 
+  summarise_if(is.numeric,(sum))
+
+kable(regions_mexico,format.args = list(big.mark = ","))
+
+# |Region   | CrunchyCo| SpicyCo|    SaltCo|     BBQCo| SalsaCo|
+# |:--------|---------:|-------:|---------:|---------:|-------:|
+# |Region 1 |  93,406.0| 111,825| 60,934.88| 34,901.76|  92,529|
+# |Region 2 |  83,650.0| 118,768| 60,420.88| 34,675.76|  97,443|
+# |Region 3 |  96,716.8| 124,579| 68,252.00| 31,754.00|  88,014|
+```
+
+# <span style="color:#61003c;">**. Build a graph to represent the previous table. What recommendations would you provide based on it? Also, explain in detail, in your own words, what is the pivot_longer function doing.**</span>
+
+```{r}
+region_mexico_long <- regions_mexico %>%
+  pivot_longer(CrunchyCo:SalsaCo, names_to = "product", values_to = "sales")
+
+region_mexico_long %>% 
+  ggplot(aes(x = product, y = sales, col = Region, group = Region)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal()
+```
+
+# <span style="color:#61003c;">**Now, build separated graphs por each Mexican region using facets.**</span>
+
+```{r}
+region_mexico_long %>% 
+  ggplot(aes(x = product, y = sales, col = Region, group = Region)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  facet_wrap(~Region) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+```
+
+# <span style="color:#61003c;">**Build a table that summarizes the performance for each region in Mexico.**</span>
+
+```{r}
+sales_by_region_mx <- region_mexico_long %>% 
+  group_by(Region) %>% 
+  summarise(Total_sales = sum(sales))
+
+kable(sales_by_region_mx, format.args = list(big.mark = ","), align = rep("c", 2))
+# |  Region  | Total_sales |
+# |:--------:|:-----------:|
+# | Region 1 |  393,596.6  |
+# | Region 2 |  394,957.6  |
+# | Region 3 |  409,315.8  |
+```
+
+# <span style="color:#61003c;">**Build a table that summarizes the total sales for product in Mexico.**</span>
+
+```{r}
+sales_by_product_mx <- region_mexico_long %>%
+  group_by(product) %>% 
+  summarise(Total_sales = sum(sales))
+
+kable(sales_by_product_mx, format.args = list(big.mark = ","), align = rep("c", 2))
+
+# |  product  | Total_sales |
+# |:---------:|:-----------:|
+# |   BBQCo   |  101,331.5  |
+# | CrunchyCo |  273,772.8  |
+# |  SalsaCo  |  277,986.0  |
+# |  SaltCo   |  189,607.8  |
+# |  SpicyCo  |  355,172.0  |
+```
+
+# <span style="color:#61003c;">**Prepare a table that shows the total sales for each month in Mexico. Which seems to be the best and worst month for sales?**</span>
+
+```{r}
+months_mexico <- crunchy_sales %>% 
+  select(-Row) %>% 
+  filter(Country == "Mexico") %>% 
+  group_by(Month) %>% 
+  summarise_if(is.numeric,(sum))
+
+months_mexico_long <- months_mexico %>%
+  pivot_longer(CrunchyCo:SalsaCo, names_to = "product", values_to = "sales")
+
+
+sales_by_month_mx <- months_mexico_long %>% 
+  group_by(Month) %>% 
+  mutate(Month = factor(Month, levels = month.name)) %>% 
+  summarise("Total Sales" = sum(sales))
+```
+
+```{r}
+glimpse(sales_by_month_mx)
+```
+
+```{r}
+glimpse(months_mexico_long)
+```
+
+```{r}
+kable(sales_by_month_mx, format.args = list(big.mark = ","),align = rep("c", 2))
+# |   Month   | Total Sales |
+# |:---------:|:-----------:|
+# |  January  |  73,450.29  |
+# | February  |  90,156.00  |
+# |   March   | 108,379.00  |
+# |   April   | 102,801.00  |
+# |    May    | 101,238.00  |
+# |   June    |  99,870.00  |
+# |   July    | 103,972.00  |
+# |  August   | 109,566.00  |
+# | September |  96,267.00  |
+# |  October  | 109,489.00  |
+# | November  | 102,586.00  |
+# | December  | 100,095.80  |
+```
+
+# <span style="color:#61003c;">**. Focus now on the sales for each product by month, build a graph to show them.**</span>
+
+```{r}
+months_mexico_long %>% 
+  ggplot(aes(x = Month, y = sales, col = product, group = product)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_x_discrete(limits = month.name) +
+  scale_y_continuous(breaks=seq(0,40000,2500))
+```
+
+# <span style="color:#61003c;">**Finally, build a graph that shows individually the sales by month for each product, and add a trend line. What are your findings? What recommendations would you provide based on it?**</span>
+
+```{r}
+months_mexico_long %>% 
+  ggplot(aes(x = Month, y = sales, col = product, group = product)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+  scale_x_discrete(limits = month.name) +
+  scale_y_continuous(breaks=seq(0,40000,2500)) +
+  facet_wrap(~product) +
+  geom_smooth(method = lm)
+```
+
+**Interpretations to be made in the final report.**
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "./src/Evidence1/A01232580_Evidence1.rmd",
+#   output_format = rmarkdown::pdf_document(),
+#   output_dir = "./documents/"
+# )
+
+# rmarkdown::render(
+#   "./src/Evidence1/A01232580_Evidence1.rmd",
+#   output_format = "html_document",
+#   output_dir = "./documents/"
+# )
+```

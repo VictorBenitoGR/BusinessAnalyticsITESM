@@ -1,0 +1,177 @@
+---
+title: "TI4. Visualization Assignment"
+date: "2024-07-20"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+    code_download: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+To complete this homework you will need to install the “datos” package that contains the data frame named millas and the package “ggplot2” that contains the data frame diamonds. No additional databases or packages are required:
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(datos)
+```
+
+# <span style="color:#61003c;">**Answer the following questions using the data frame millas:**</span>
+
+```{r}
+glimpse(millas)
+```
+
+## <span style="color:#61003c;">**Which geom should you use to generate:**</span>
+
+- A line graphic (a connecting line and also a trend line)
+```{r}
+ggplot(millas, aes(x = anio, y = autopista)) +
+  geom_line(stat = "summary", fun = "mean")
+```
+
+- A box plot
+
+```{r}
+ggplot(millas, aes(x = fabricante, y = autopista)) +
+  geom_boxplot() +
+  theme_minimal()
+```
+
+- A histogram
+
+```{r}
+ggplot(millas, aes(x = autopista)) +
+  geom_histogram(binwidth = 5, fill = "blue", color = "black")
+```
+
+## <span style="color:#61003c;">**. Execute the following code and describe in your own words what are the results showed in the graph**</span>
+
+The graph provides insight into how engine displacement (cilindrada) affects highway (autopista) fuel differently depending on the type of drive (traccion), with front-wheel drive vehicles generally being more fuel-efficient, especially at lower engine displacements (cilindrada).
+
+```{r}
+ggplot(millas, aes(x = cilindrada, y = autopista, color = traccion)) +
+    geom_point() +
+    geom_smooth(se = FALSE)
+```
+
+## <span style="color:#61003c;">**In the previous exercise, What is shown when using show.legend = FALSE inside geom_smooth()? What happens if you remove show.legend = FALSE from the code?**</span>
+
+In this particular plot nothing happens when you put it only in geom_smooth()
+
+```{r}
+ggplot(millas, aes(x = cilindrada, y = autopista, color = traccion)) +
+    geom_point() +
+    geom_smooth(se = FALSE, show.legend = FALSE)
+```
+
+... you have to either put it in both geom_point() and geom_smooth()
+
+```{r}
+ggplot(millas, aes(x = cilindrada, y = autopista, color = traccion)) +
+    geom_point(show.legend = FALSE) +
+    geom_smooth(se = FALSE, show.legend = FALSE)
+```
+
+... or using theme(legend.position = 'none') to remove the legend.
+
+```{r}
+ggplot(millas, aes(x = cilindrada, y = autopista, color = traccion)) +
+    geom_point() +
+    geom_smooth(se = FALSE) +
+    theme(legend.position = 'none')
+```
+
+## <span style="color:#61003c;">**What does the argument se do in geom_smooth()?**</span>
+
+It adds a shaded area around the line that represents the standard error of the mean. If you set it to TRUE, it will show the shaded area.
+
+```{r}
+ggplot(millas, aes(x = cilindrada, y = autopista, color = traccion)) +
+    geom_point() +
+    geom_smooth(se = TRUE)
+```
+
+## <span style="color:#61003c;">**Do these two graphics are displayed differently? Why?**</span>
+
+Yes, the only one that is displayed is the first one. The second one is not displayed because it's not correctly written, because you have to specify the data frame in the ggplot() function and not in the geom_point() and geom_smooth() functions, which are used to specify the aesthetics.
+
+```{r}
+ggplot(millas, aes(x = cilindrada, y = autopista)) +
+  geom_point() +
+  geom_smooth()
+```
+
+```{r}
+# ggplot() +
+#   geom_point(millas, aes(x = cilindrada, y = autopista)) +
+#   geom_smooth(millas, aes(x = cilindrada, y = autopista))
+```
+
+# <span style="color:#61003c;">**Answer the following exercise using the data frame diamonds:**</span> 
+
+```{r}
+glimpse(diamonds)
+```
+
+## <span style="color:#61003c;">**Recreate this graphic. The parameter that controls the transparency is 0.3. It is not necessary that you present it using the same colors, but it is mandatory that all colors must be able to differentiate.**</span>
+
+```{r}
+# Color-blind friendly palette
+okabe_ito <- c(
+  "#E69F00", "#56B4E9", "#009E73", "#F0E442",
+  "#0072B2", "#D55E00", "#CC79A7", "#999999"
+)
+
+ggplot(diamonds, aes(x = carat, y = price, color = clarity)) +
+  geom_point(alpha = 0.3) +
+  labs(title = "Scatterplot of Diamond Prices", x = "Diamond Carats", y = "Diamond Price") +
+  scale_color_manual(values = okabe_ito) +
+  theme_minimal()
+```
+
+## <span style="color:#61003c;">**Using the information contained in the diamonds data set...**</span>
+
+### <span style="color:#61003c;">**Recreate the following graphics**</span>
+
+```{r}
+ggplot(diamonds, aes(x = price)) +
+  geom_histogram(binwidth = 625, fill = "#E69F00", color = "#000000") +
+  labs(x = "price", y = "count") +
+  theme_minimal()
+```
+
+### <span style="color:#61003c;">**Recreate the following graphics**</span>
+
+```{r}
+ggplot(diamonds, aes(x = clarity)) +
+  geom_bar(aes(fill = clarity)) +
+  scale_fill_manual(values = okabe_ito) +
+  theme_minimal() +
+  labs(x = "clarity", y = "count") +
+  theme(legend.position = "none")
+```
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "A01232580_Session8.rmd",
+#   output_format = rmarkdown::pdf_document(),
+#   output_dir = "./documents/"
+# )
+
+rmarkdown::render(
+  "./src/TI4/A01232580_TI4.Rmd",
+  output_format = "html_document",
+  output_dir = "./documents/"
+)
+```
