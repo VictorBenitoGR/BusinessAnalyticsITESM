@@ -1,0 +1,141 @@
+---
+title: Session 6
+author: "Victor Benito Garcia Rocha"
+date: "2024-07-11"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+---
+
+# <span style="color:#0000FF;">**Part 1**</span>
+
+### 1. Import the Credit_card_customersV2.xlsx
+
+```{r}
+library(readxl)
+library(tidyverse)
+
+Credit_card_costumers <- read_excel(
+  "Credit_card_costumersV2.xlsx"
+)
+```
+
+```{r}
+Credit_card_costumers
+```
+
+### 2. Name it CCC and print the header.
+
+```{r}
+CCC <- Credit_card_costumers
+head(CCC)
+```
+
+# <span style="color:#0000FF;">Part 2</span>
+
+### 3. Get the names for all the variables. Change the name of the variable “Debit card” to “Debit_card_fixed”. Use the function rename to do it.
+
+```{r}
+names(CCC)
+```
+
+```{r}
+CCC <- CCC %>%
+  rename(Debit_card_fixed = `Debit card`)
+names(CCC)
+```
+
+# <span style="color:#0000FF;">Part 3</span>
+
+The objective is to modify the variable so that at the end we have a string of 16 digits (without hyphens or blank spaces).
+
+### 4. Determine if the registers (observations) for that variable have a hyphen (use the str_detect function).
+
+```{r}
+CCC %>%
+  select(`Debit_card_fixed`) %>%
+  filter(str_detect(`Debit_card_fixed`, "-"))
+```
+
+### 5. Use the function table for the above operation to determine how many observations have a hypen.
+
+```{r}
+CCC %>%
+  select(`Debit_card_fixed`) %>%
+  filter(str_detect(`Debit_card_fixed`, "-")) %>%
+  table()
+```
+
+```{r}
+CCC %>%
+  select(`Debit_card_fixed`) %>%
+  filter(str_detect(`Debit_card_fixed`, "-")) %>%
+  nrow()
+```
+
+# <span style="color:#0000FF;">Part 4</span>
+
+### 6. Remove the hyphen and white spaces with str_remove_all.
+
+```{r}
+CCC <- CCC %>%
+  mutate(Debit_card_fixed = str_remove_all(`Debit_card_fixed`, "-")) %>%
+  mutate(Debit_card_fixed = str_remove_all(`Debit_card_fixed`, " "))
+CCC
+```
+
+### 7. Create a new dataset (CCC2) that includes only column 1 and 19.
+
+```{r}
+CCC2 <- CCC %>%
+  select(1, 19)
+CCC2
+```
+
+### 8. Use table and str_length to determine if you have debit card numbers different to 16 digits.
+
+```{r}
+CCC2 %>%
+  filter(str_length(Debit_card_fixed) != 16) %>%
+  table()
+```
+
+### 9. Use filter to show the observations that have a debit card number different to 16 digits.
+
+```{r}
+CCC2 %>%
+  filter(str_length(Debit_card_fixed) != 16)
+```
+
+# <span style="color:#0000FF;">Part 5</span>
+
+### 10. Use filter and overwrite in CCC2 a new dataset that has debit card numbers of only 16 digits. Print CCC2 using the DT library. 
+
+```{r}
+CCC2 <- CCC2 %>%
+  filter(str_length(Debit_card_fixed) == 16)
+
+library(DT)
+datatable(CCC2)
+```
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "A01232580_Session6.Rmd",
+#   output_format = rmarkdown::pdf_document(),
+#   output_dir = "./docs/"
+# )
+
+# rmarkdown::render(
+#   "A01232580_Session6.Rmd",
+#   output_format = "html_document",
+#   output_dir = "./docs/"
+# )
+```

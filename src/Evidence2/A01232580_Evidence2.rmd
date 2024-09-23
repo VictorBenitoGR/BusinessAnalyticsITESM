@@ -1,0 +1,621 @@
+---
+title: "Evidence 2: R Markdown file"
+author: "Víctor Benito García Rocha - A01232580"
+date: "2024-07-26 "
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    toc_collapsed: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+    code_download: TRUE
+---
+
+# **An International Endeavor**
+
+- **The Company**
+
+Crunchy is a multinational company with a presence in over 40 countries. Executives in the company consider that it has continued growing in recent decades due to its marketing techniques, adaptation to markets, and a reasonably competitive price-quality relationship. During its expansion, the company opened its first production branch in Mexico; this branch has now completed its first year of operations in the country; the first annual Sales and Significant Statistics (SSS) report is being prepared.
+
+Crunchy's main product is potato chips, offered in 40 different variations, depending on each country's trends and preferences. The company is new to the Mexican market, so the executives in the company implemented a cautious approach, due to the high competition: Crunchy in Mexico only offers internationally recognized products, resulting in a limited variety of flavors; another decision in this sense was that only one size is available in Mexico.
+
+To enter the Mexican markets, the company decided to change the name of most of its products to make them more appealing. Therefore, even though the chips follow the same recipe, their logo pursue a different marketing position; also, the colors of the plastic bag are different from those used in Europe or the United States. As part of the adapting process in the Mexican market, the company offers specific packaging in México.
+
+As part of the Mexican branch of Crunchy, an Analytical Team (AT) was created to provide the company’s executives with useful information for the decision-making process.
+
+The AT team considers that the first SSS report in the Mexican branch would help them to assess the extent of product penetration in the country and to compare salaries in México versus other companies’ salaries worldwide.
+
+Also, the AT team´s perspective is that the aforementioned report could be helpful to compare sales with similar markets and to understand whether a significant presence has been achieved in the Mexican market. Based on the information provided by the AT team’s evaluation, executives in the company could reach decisions such as increasing the number of products, modifying salaries, establishing a second branch in another state of the country, and determining whether to continue with growth or to adapt or adjust a product to boost sales
+
+- **An Analysis for the Decision-Making Process**
+
+To start a useful comparative analysis, the AT team considers that they need both worldwide historical sales data and historical sales data from the Mexican market. From the SSS first annual report of the branch in México, the AT team found the worldwide information that is available in the given datasets. Also, the AT team found the historical sales data from the Mexican market in the SSS first annual report.
+
+After reviewing both files, the AT team found some inconsistencies and differences with both databases. For instance, in the worldwide database, the potato chips names appear as "Crunchy", but in Mexico this product is sold under the name “CrujiCos” Similarly, the spicy chips labeled as “SpicyCo” in the worldwide database are presented as “PicanCos” in Mexico. Other examples: The “SaltCo” is presented as “SaladoCos”, the “BBQCo” is called “BBQCos”, and finally, “SalsaCo” is known as “SalsaCos” in Mexico.
+
+The AT team considers that another challenge in this comparison is the currencies difference, where the worldwide database is in USD, and the Mexican database is in Mexican pesos. The AT team concluded that, to ensure consistency and facilitate sharing information with the foreign headquarters, all the results need to be presented in USD, using the average of the previous month as the exchange rate.
+
+Another finding of the AT team is that both databases are divided into three regions in each country, with each region representing around 33% of the population, thus, there is a need to find a meaningful comparison. In addition, they found that both databases include monthly sales readings, necessitating thorough analysis to determine the correct method of comparing regions across different countries is evidently required.
+
+The AT team considers that the process of the analysis needs a count of employee salaries, which should be treated separately from the analysis of the potato chip sales; their opinion is that salary data adds extra context, about the workforce.
+
+- **The Expected AT Team´s Report**
+
+The AT team will prepare a report that considers the information they found, and which is mentioned above. In a first meeting, they will present this report to the executives in the Mexican branch; then, they will present this report to the corporate executives in Crunchy.
+
+The AT team´s final report is expected to handle missing data, errors in titles, currency exchange, and other issues. The analysis must include relevant statistical data, charts, and a clear and precise presentation of the information. This report must also include comparisons between regions, products, and months. 
+
+This final report must include linear graphs to look for trends in sales, present the information with the USA names, compare the wages, an analysis about the number of workers and the relevant information that results of the analysis of the data. The AT team plans to prepare a summary of the findings and a set of recommendations.
+
+Local and corporate executives in Crunchy expect that the conclusions provided by the AT team will allow them to understand the penetration of the company in the Mexican market. They trust that the information provided by the AT team will enable a clear visualization of the direction for the company's next steps in the country.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+- **Libraries:**
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(visdat)
+library(knitr)
+```
+
+## <span style="color:#003366">**Import datasets and present a glimpse, names and header for the four of them. You must have: crunchy_sales_USA,  crunchy_sales_MX, crunchy_wages_USA and crunchy_wages_MX.**</span> 
+
+```{r}
+crunchy_sales_MX <- read_excel(
+  "CrunchyMX.xlsx",
+  sheet = "Sales"
+)
+
+crunchy_wages_MX <- read_excel(
+  "CrunchyMX.xlsx",
+  sheet = "Wages"
+)
+```
+
+```{r}
+glimpse(crunchy_sales_MX)
+```
+
+```{r}
+names(crunchy_sales_MX)
+```
+
+```{r}
+head(crunchy_sales_MX)
+```
+
+```{r}
+glimpse(crunchy_wages_MX)
+```
+
+```{r}
+names(crunchy_wages_MX)
+```
+
+```{r}
+head(crunchy_wages_MX)
+```
+
+```{r}
+crunchy_sales_USA <- read_excel(
+  "CrunchyUSA.xlsx",
+  sheet = "Sales"
+)
+
+crunchy_wages_USA <- read_excel(
+  "CrunchyUSA.xlsx",
+  sheet = "Wages"
+)
+```
+
+```{r}
+glimpse(crunchy_sales_USA)
+```
+
+```{r}
+names(crunchy_sales_USA)
+```
+
+```{r}
+head(crunchy_sales_USA)
+```
+
+```{r}
+glimpse(crunchy_wages_USA)
+```
+
+```{r}
+names(crunchy_wages_USA)
+```
+
+```{r}
+head(crunchy_wages_USA)
+```
+
+## <span style="color:#003366">**Start working with Crunchy_sales_MX. Use vis_miss to identify NA’s.**</span>
+
+```{r}
+vis_miss(crunchy_sales_MX)
+```
+
+### Look for outliers with a boxplot for numerical variables, replace NA’s with mean if you do not have outliers, replace it with median otherwise. 
+
+```{r}
+# Boxplot of CrujiCos, SaladoCos, and BBQCos
+boxplot(crunchy_sales_MX$CrujiCos, main = "CrujiCos", col = "lightblue")
+boxplot(crunchy_sales_MX$SaladoCos, main = "SaladoCos", col = "lightblue")
+boxplot(crunchy_sales_MX$BBQCos, main = "BBQCos", col = "lightblue")
+```
+
+```{r}
+# Replace NA's with mean
+crunchy_sales_MX <- crunchy_sales_MX %>%
+  mutate(
+    CrujiCos = ifelse(is.na(CrujiCos), mean(CrujiCos, na.rm = TRUE), CrujiCos),
+    SaladoCos = ifelse(
+      is.na(SaladoCos), mean(SaladoCos, na.rm = TRUE), SaladoCos
+    ),
+    BBQCos = ifelse(is.na(BBQCos), mean(BBQCos, na.rm = TRUE), BBQCos)
+  )
+```
+
+```{r}
+vis_miss(crunchy_sales_MX)
+```
+
+### Fill the spaces for month with fill(dataset,.direction=”up or down") Column: Month
+
+```{r}
+crunchy_sales_MX <- crunchy_sales_MX %>%
+  fill(Month, .direction = "down")
+head(crunchy_sales_MX)
+```
+
+### Run again the vis_miss at the end to verify you don’t have any NA.
+
+```{r}
+vis_miss(crunchy_sales_MX)
+```
+
+## <span style="color:#003366">**Rename the columns to match the Crunchy_sales_USA names. Show the header of the object.**</span>
+
+```{r}
+colnames(crunchy_sales_MX) <- c(
+  "Row", "Month", "Region", "CrunchyCo", "SpicyCo", "SaltCo", "BBQCo", "SalsaCo"
+)
+names(crunchy_sales_MX)
+```
+
+## <span style="color:#003366">**Add a column ”Country” and write Mexico in every observation. Show the header of the object. **</span>
+
+```{r}
+crunchy_sales_MX <- crunchy_sales_MX %>%
+  mutate(Country = "Mexico")
+head(crunchy_sales_MX)
+```
+
+#### <span style="color:#003366">**5. Repeat steps 2 and 4  for Crunchy_sales_USA (for step 4, write USA).**</span>
+
+```{r}
+vis_miss(crunchy_sales_USA)
+```
+
+```{r}
+boxplot(crunchy_sales_USA$CrunchyCo, main = "CrunchyCo", col = "lightblue")
+boxplot(crunchy_sales_USA$SaltCo, main = "SaltCo", col = "lightblue")
+boxplot(crunchy_sales_USA$BBQCo, main = "BBQCo", col = "lightblue")
+```
+
+```{r}
+crunchy_sales_USA <- crunchy_sales_USA %>%
+  mutate(
+    CrunchyCo = ifelse(
+      is.na(CrunchyCo), mean(CrunchyCo, na.rm = TRUE), CrunchyCo
+    ),
+    SaltCo = ifelse(is.na(SaltCo), mean(SaltCo, na.rm = TRUE), SaltCo),
+    BBQCo = ifelse(is.na(BBQCo), mean(BBQCo, na.rm = TRUE), BBQCo)
+  )
+```
+
+```{r}
+vis_miss(crunchy_sales_USA)
+```
+
+```{r}
+crunchy_sales_USA <- crunchy_sales_USA %>%
+  fill(Month, .direction = "down")
+
+head(crunchy_sales_USA)
+```
+
+```{r}
+crunchy_sales_USA <- crunchy_sales_USA %>%
+  mutate(Country = "USA")
+
+head(crunchy_sales_USA)
+```
+
+```{r}
+vis_miss(crunchy_sales_USA)
+```
+
+## <span style="color:#003366">**Merge with rbind Crunchy_sales_USA and Crunchy_sales_MX and name it crunchy_sales.**</span>
+
+```{r}
+crunchy_sales <- rbind(crunchy_sales_USA, crunchy_sales_MX)
+```
+
+## <span style="color:#003366">**For crunchy_wages_USA and crunchy_wages_MX:**</span>
+
+### In variable “wage”, remove the observation that has text using subset and  change it to numeric.
+
+```{r}
+names(crunchy_wages_MX)
+# [1] "Number of workers" "Wage (USD)"
+```
+
+```{r}
+names(crunchy_wages_USA)
+# [1] "Number of workers" "Wage (USD)"
+```
+
+```{r}
+# Más de $62,000 (crunchy_wages_MX) to $62000
+crunchy_wages_MX <- crunchy_wages_MX %>%
+  subset(!grepl("Más de", `Wage (USD)`)) %>%
+  mutate(`Wage (USD)` = as.numeric(gsub("\\$", "", `Wage (USD)`)))
+
+class(crunchy_wages_MX$`Wage (USD)`)
+```
+
+```{r}
+# More than $41,000 (crunchy_wages_USA) to $41000
+crunchy_wages_USA <- crunchy_wages_USA %>%
+  subset(!grepl("More than", `Wage (USD)`)) %>%
+  mutate(`Wage (USD)` = as.numeric(gsub("\\$", "", `Wage (USD)`)))
+
+class(crunchy_wages_USA$`Wage (USD)`)
+```
+
+### Add a column “country” as in step 4.
+
+```{r}
+crunchy_wages_MX <- crunchy_wages_MX %>%
+  mutate(Country = "Mexico")
+head(crunchy_wages_MX)
+```
+
+```{r}
+crunchy_wages_USA <- crunchy_wages_USA %>%
+  mutate(Country = "USA")
+head(crunchy_wages_USA)
+```
+
+### In crunchy_MX_wages mutate the variable Wage (USD) to change the currency to USD, use 16.84MXN -> 1 USD.
+
+```{r}
+crunchy_wages_MX <- crunchy_wages_MX %>%
+  mutate(`Wage (USD)` = `Wage (USD)` / 16.84)
+head(crunchy_wages_MX)
+```
+
+### In crunchy_USA_wages mutate to round up to an integer the variable Number of workers. Hint: decide if you use ceiling or floor function. 
+
+```{r}
+# If the decimal part is greater than 0.5, round up, otherwise, round down.
+crunchy_wages_USA <- crunchy_wages_USA %>%
+  mutate(
+    `Number of workers` = ifelse(
+      `Number of workers` - floor(`Number of workers`) > 0.5,
+      ceiling(`Number of workers`), floor(`Number of workers`)
+    )
+  )
+```
+
+### Merge both datasets into a single one: crunchy_wages.
+
+```{r}
+crunchy_wages <- rbind(crunchy_wages_USA, crunchy_wages_MX)
+head(crunchy_wages)
+```
+
+### For both variables, change the name to avoid white spaces.
+
+```{r}
+colnames(crunchy_wages) <- c("Number_of_workers", "Wage_USD", "Country")
+names(crunchy_wages)
+```
+
+## <span style="color:#003366">**Use kable (library: knitr) to present the 2 final datasets.**</span>
+
+```{r}
+kable(crunchy_sales)
+```
+
+```{r}
+kable(crunchy_wages)
+```
+
+## <span style="color:#003366">**Change the name to the crunchy_wages variables (in case you din’t before) and replace Global by USA in both data sets (crunchy_wages and crunchy_sales).**</span>
+
+```{r}
+names(crunchy_wages)
+```
+
+```{r}
+crunchy_wages <- crunchy_wages %>%
+  mutate(Country = replace(Country, Country == "USA", "Global"))
+
+crunchy_sales <- crunchy_sales %>%
+  mutate(Country = replace(Country, Country == "USA", "Global"))
+```
+
+## <span style="color:#003366">**Get the names for the levels of the Month variable in crunchy_sales. You need to change everything to english language. Verify at the end (with function levels) that this was solved.**</span>
+
+```{r}
+levels(as.factor(crunchy_sales$Month))
+```
+
+```{r}
+crunchy_sales <- crunchy_sales %>%
+  mutate(Month = replace(Month, Month == "Enero", "January")) %>%
+  mutate(Month = replace(Month, Month == "Febrero", "February")) %>%
+  mutate(Month = replace(Month, Month == "Marzo", "March")) %>%
+  mutate(Month = replace(Month, Month == "Abril", "April")) %>%
+  mutate(Month = replace(Month, Month == "Mayo", "May")) %>%
+  mutate(Month = replace(Month, Month == "Junio", "June")) %>%
+  mutate(Month = replace(Month, Month == "Julio", "July")) %>%
+  mutate(Month = replace(Month, Month == "Agosto", "August")) %>%
+  mutate(Month = replace(Month, Month == "Sepbre", "September")) %>%
+  mutate(Month = replace(Month, Month == "Octubre", "October")) %>%
+  mutate(Month = replace(Month, Month == "Noviembre", "November")) %>%
+  mutate(Month = replace(Month, Month == "Diciembre", "December"))
+
+levels(as.factor(crunchy_sales$Month))
+```
+
+## <span style="color:#003366">**Replace “Región 1” by “Region 1” and so on in crunchy_sales.**</span>
+
+```{r}
+crunchy_sales <- crunchy_sales %>%
+  mutate(Region = replace(Region, Region == "Región 1", "Region 1")) %>%
+  mutate(Region = replace(Region, Region == "Región 2", "Region 2")) %>%
+  mutate(Region = replace(Region, Region == "Región 3", "Region 3"))
+```
+
+## <span style="color:#003366">**Create the following graph for Global wages. Change the name of the axis labels to Number of workers and Wage (USD).**</span>
+
+```{r}
+crunchy_wages %>%
+  filter(Country == "Global") %>%
+  ggplot(aes(x = Wage_USD, y = Number_of_workers)) +
+  geom_line(aes(col = Country)) +
+  theme_minimal()
+```
+
+## <span style="color:#003366">**Create the previous graph now for Mexico wages. Change the name of the axis labels to Number of workers and Wage (USD).**</span>
+
+```{r}
+crunchy_wages %>%
+  filter(Country == "Mexico") %>%
+  ggplot(aes(x = Wage_USD, y = Number_of_workers)) +
+  geom_line(aes(col = Country)) +
+  theme_minimal()
+```
+
+### **Question to be answered in your final report:**
+
+- **What distribution seems to have each one of the graphs? Do you notice skewness? What recommendation would you provide related to the wages of Crunchy Co.**
+
+While the global wage distribution has a symmetrical, bell-shaped curve with a peak around 20k USD, our country's wage distribution, although similar in shape, shows slight skewness to the left while peaking around 1.5k USD. This discrepancy suggests a significant difference in wage levels between the two markets. To address this, it's crucial for the company to benchmark its wages against industry standards both globally and in Mexico. Considering the cost of living variations, the company could adjust wages to ensure they are competitive and fair across different regions, possibly increasing salaries in areas with higher living costs. And as I said before, the slight skewness in the Mexican wage data indicates that the average wage is lower, which might affect morale and retention.
+
+## <span style="color:#003366">**Build the following table, it shows the total sales for every product by country. What conclusion would you get from it? Do the products perform the same in Mexico compared to other countries?**</span>
+
+It's evident that the sales figures for all products are significantly higher on the global scale compared to the Mexican market. This trend is consistent across all products listed, normal considering the company itself stated that required an aggressive stratetegy to incursionate in the Mexican market.
+
+```{r}
+glimpse(crunchy_sales_MX)
+```
+
+```{r}
+sales_by_country <- crunchy_sales %>%
+  select(-Row) %>%
+  group_by(Country) %>%
+  summarise_if(is.numeric, (sum))
+
+kable(sales_by_country, format.args = list(big.mark = ","))
+```
+
+## <span style="color:#003366">**Build the following graph that represents the previous table. Use minimal theme. In your final report, it must have an interpretation.**</span>
+
+While the products do follow the same ranking in terms of popularity (SpicyCo being the top seller in both contexts) the scale of sales disparity could prove that the problem is not the product itself, but a failure in brand recognition, market preferences, or competition within the already consolidated Mexican market (although it could be interesting to make a deeper research about possible dishonest practices in the Mexican market, or calculate the impact of informal brands).
+
+```{r}
+total_sales <- crunchy_sales %>%
+  select(-c(Row, Month, Region))
+
+total_sales_long <- total_sales %>%
+  pivot_longer(CrunchyCo:SalsaCo, names_to = "product", values_to = "sales")
+
+options(scipen = 999)
+
+ggplot(total_sales_long, aes(x = product, y = sales, fill = Country)) +
+  geom_col() +
+  facet_wrap(~Country) +
+  scale_y_continuous(breaks = seq(0, 3100000, 250000)) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+## <span style="color:#003366">**Build the following dodge bar plot. In your final report, it must have an interpretation. Which one seems to be better to represent the dataset?**</span>
+
+Some possible strategies might include localized marketing campaigns (not just the name as the company tried), expanding product varieties and sizes since they haven't experiment on it, specially when talking about SalsaCo that has the 4th place in the global market but achieved a solid 2nd place tie with CrunchyCo, expected considering the spicy food culture in Mexico that's also represented in the SpicyCo sales.
+
+```{r}
+ggplot(total_sales_long, aes(x = product, y = sales, fill = Country)) +
+  stat_summary(geom = "col", fun = "sum", position = "dodge") +
+  scale_y_continuous(breaks = seq(0, 3100000, 250000)) +
+  theme_minimal()
+```
+
+## <span style="color:#003366">**Now, let’s focus on the Mexican market. Build the following table. What can you say about the performance of each region/product?**</span>
+
+In region 1 and 2, SpicyCo is the top seller, while in region 3, CrunchyCo takes the lead. This could be due to either regional preferences or the company's marketing strategy.
+
+```{r}
+regions_mexico <- crunchy_sales %>%
+  select(-Row) %>%
+  filter(Country == "Mexico") %>%
+  group_by(Region) %>%
+  summarise_if(is.numeric, (sum))
+
+kable(regions_mexico, format.args = list(big.mark = ","))
+```
+
+## <span style="color:#003366">**Build a graph to represent the previous table. What recommendations would you provide based on it? Also, explain in detail, in your own words, what is the pivot_longer function doing.**</span>
+
+If as we said the company tries to expand its product line with an experiment with SalsaCo, it could be important to focus on region 3 while reducing the investment on BBQCo and or SaltCo.
+
+```{r}
+region_mexico_long <- regions_mexico %>%
+  pivot_longer(CrunchyCo:SalsaCo, names_to = "product", values_to = "sales")
+
+region_mexico_long %>%
+  ggplot(aes(x = product, y = sales, col = Region, group = Region)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal()
+```
+
+## <span style="color:#003366">**Now, build separated graphs por each Mexican region using facets.**</span>
+
+```{r}
+region_mexico_long %>%
+  ggplot(aes(x = product, y = sales, col = Region, group = Region)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  facet_wrap(~Region) +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1))
+```
+
+## <span style="color:#003366">**Build a table that summarizes the performance for each region in Mexico.**</span>
+
+```{r}
+sales_by_region_mx <- region_mexico_long %>%
+  group_by(Region) %>%
+  summarise(Total_sales = sum(sales))
+
+kable(
+  sales_by_region_mx,
+  format.args = list(big.mark = ","), align = rep("c", 2)
+)
+```
+
+## <span style="color:#003366">**Build a table that summarizes the total sales for product in Mexico.**</span>
+
+```{r}
+sales_by_product_mx <- region_mexico_long %>%
+  group_by(product) %>%
+  summarise(Total_sales = sum(sales))
+
+kable(
+  sales_by_product_mx,
+  format.args = list(big.mark = ","), align = rep("c", 2)
+)
+```
+
+## <span style="color:#003366">**Prepare a table that shows the total sales for each month in Mexico. Which seems to be the best and worst month for sales?**</span>
+
+```{r}
+months_mexico <- crunchy_sales %>%
+  select(-Row) %>%
+  filter(Country == "Mexico") %>%
+  group_by(Month) %>%
+  summarise_if(is.numeric, (sum))
+
+months_mexico_long <- months_mexico %>%
+  pivot_longer(CrunchyCo:SalsaCo, names_to = "product", values_to = "sales")
+
+
+sales_by_month_mx <- months_mexico_long %>%
+  group_by(Month) %>%
+  mutate(Month = factor(Month, levels = month.name)) %>%
+  summarise("Total Sales" = sum(sales))
+```
+
+```{r}
+glimpse(sales_by_month_mx)
+```
+
+```{r}
+glimpse(months_mexico_long)
+```
+
+The best month for sales in Mexico is August with 109k USD, which could be due to the back-to-school season, while the worst month is January with 44k USD, possibly due to the post-holiday season where most schools are closed too. This is an important trend that which could require a deeper understand of the average consumer age.
+
+```{r}
+kable(
+  sales_by_month_mx,
+  format.args = list(big.mark = ","), align = rep("c", 2)
+)
+```
+
+## <span style="color:#003366">**Focus now on the sales for each product by month, build a graph to show them.**</span>
+
+```{r}
+months_mexico_long %>%
+  ggplot(aes(x = Month, y = sales, col = product, group = product)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  scale_x_discrete(limits = month.name) +
+  scale_y_continuous(breaks = seq(0, 40000, 2500))
+```
+
+## <span style="color:#003366">**Finally, build a graph that shows individually the sales by month for each product, and add a trend line. What are your findings? What recommendations would you provide based on it?**</span>
+
+By maintining the same height proportion, we better see how CrunchyCo (original flavor) and SpicyCo are the standout performers. As I said before, it interestingly shows some notable seasonal trends, particularly for SpicyCo, which experiences **significant** fluctuations with peaks in March and August (back-to-school season), which may require a better understading of the average consumer age.
+
+Overall, SpicyCo and CrunchyCo are the only ones who demonstrate upward trends throughout the year, while the others maintain relatively stable sales with slight growth. For BBQCo though, reducing its presence in favor of better-performing products might be worth considering, maybe if they decide to try with the extensive flavor line they have in the global market.
+
+Given these findings of the comparison with the global market, it would be prudent for the company to focus its marketing efforts on new sizes and marketing campaign for SalsaCo during the mentioned seasons, which shows the same peak potential that SpicyCo has. It's also relevant to see why CrunchyCo doesn't achieve the same August peak, but rather slows to its worst level without considering the start of the year.
+
+That's not enough, as we analyzed with the big scale difference with the global market, pricing strategy should be carefully analyzed considering the performance of each product. Adjusting prices might help find the optimal price-demand balance considering how big the informal market is in the country due to economical disparity.
+```{r}
+months_mexico_long %>%
+  ggplot(aes(x = Month, y = sales, col = product, group = product)) +
+  geom_line() +
+  geom_point() +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  scale_x_discrete(limits = month.name) +
+  scale_y_continuous(breaks = seq(0, 40000, 2500)) +
+  facet_wrap(~product) +
+  geom_smooth(method = lm)
+```
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "./src/Evidence2/A01232580_Evidence2.rmd",
+#   output_format = rmarkdown::pdf_document(),
+#   output_dir = "./documents/"
+# )
+
+# rmarkdown::render(
+#   "./src/Evidence2/A01232580_Evidence2.rmd",
+#   output_format = "html_document",
+#   output_dir = "./documents/"
+# )
+```

@@ -1,0 +1,265 @@
+---
+title: "Session 7"
+date: "2024-07-14"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(visdat)
+```
+
+```{r}
+comics <- read.csv("./data/comics-1-1.csv", na.strings = "NA")
+```
+
+```{r}
+glimpse(comics)
+```
+
+The dataset has 23,272 observations and 11 variables, which are describing comic characers and their meta.
+
+```{r}
+summary(comics)
+```
+
+We can see that there are 1451 missing values in the dataset, which represents 6.23% of the total observations.
+
+```{r}
+vis_miss(comics)
+```
+
+This shows that most of the missing values are in the gsm column.
+
+# Evidence Session # 07
+
+## <span style="color:#61003c;">**Part I**</span>
+#### 1.1 Create a new dataset "comics2" that keeps complete observations (drop NA's) for the variables "id" and "align".
+
+```{r}
+comics2 <- comics %>% drop_na(id, align)
+```
+
+#### 1.2 Get the levels for "id", "align" and then build a contingency table for both variables.
+
+```{r}
+levels(comics2$id)
+levels(comics2$align)
+table(comics2$id, comics2$align)
+```
+
+The contingency table shows that most of the characters are secret or public. Most of the bad one are secret, while the good ones are public.
+
+#### 1.3 The contingency table from the last exercise revealed that there are some levels that have very low counts. To simplify the analysis, it often helps to drop such levels. Overwrite comics2 and filter values that do not have "Reformed Criminals". Get the sum for the rows and columns. 
+
+```{r}
+comics2 <- comics2 %>% filter(align != "Reformed Criminals")
+```
+
+```{r}
+table(comics2$id, comics2$align)
+```
+
+Now we have only three levels for the variable align. There's no more changes.
+
+```{r}
+rowSums(table(comics2$id, comics2$align))
+```
+
+In the end, we identify that there are more secret characters, followed by public and no dual. There are only 9 unknown characters.
+
+#### 1.4 Create a bar chart for the variable id. 
+
+```{r}
+library(ggplot2)
+
+ggplot(comics2, aes(x = id)) +
+  geom_bar(fill = "#12003c") +
+  labs(title = "ID Variable", x = "ID", y = "Count") +
+  theme_minimal()
+```
+
+We graphically represent the last table, showing the number of characters for each level of the variable id showing again that most of the characters are secret by a good margin.
+
+#### 1.5 We still have a level ("unkwown") with a low count, remove it and now create a bar chart for the variable id and group by (facet) align.
+
+```{r}
+comics2 <- comics2 %>% filter(id != "Unknown")
+ggplot(comics2, aes(x = id)) +
+  geom_bar(fill = "#12003c") +
+  labs(title = "ID Variable", x = "ID", y = "Count") +
+  facet_wrap(~align) +
+  theme_minimal()
+```
+
+Now we clearly see that bad characters are mostly secret, while good characters are mostly public but with not a big difference. Neutral characters have basically the same lenght.
+
+#### 1.6 While a contingency table represents the counts numerically, it’s often more useful to represent them graphically. Build a side-by-side bar plot and a stacked bar plot for ID and Align variables. 
+
+```{r}
+# I'll use the okabe-ito palette for color blind people
+okabe_ito <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7", "#999999")
+
+ggplot(comics2, aes(x = id, fill = align)) +
+  geom_bar(position = "dodge") +
+  labs(title = "ID Variable", x = "ID", y = "Count") +
+  scale_fill_manual(values = okabe_ito) +
+  theme_minimal()
+```
+
+Now we have a better way to explain what we said, since we have the bars of the character's moral alignment side by side.
+
+## <span style="color:#61003c;">**Part II**</span>
+
+## 2.1 For this section, we will use the cars dataset. Import it, then get a glimpse for it and identify the number of observations and variables.
+
+```{r}
+cars <- read.csv("./data/cars-1.csv", na.strings = "NA")
+```
+
+```{r}
+glimpse(cars)
+```
+
+We have 428 observations and 19 variables in the dataset, which are describing all the features of a car in order to make a custom analysis based on our needs.
+
+### 2.2 Let's start with some basic graphs, build a dotplot, horizontal-boxplot,  histogram and density plot for the variable weight. Before making the plots, present a graphical tool to identify NA's, ggplot is robust to them, you don't need to exclude them. Keep the outliers for this time. 
+
+- Visdat
+
+Missing values only represent 1.1% of the total this time, and seems to be a problem with the last inputs of lenght and width from whoever retrieve the data.
+
+```{r}
+vis_miss(cars)
+```
+
+- Dotplot
+
+This shows us that we can consider the weight variable as a normal distribution.
+
+```{r}
+ggplot(cars, aes(x = weight)) +
+  geom_dotplot(binwidth = 100, fill = "#12003c") +
+  labs(title = "Weight Variable", x = "Weight", y = "Count") +
+  theme_minimal()
+```
+
+- Horizontal-boxplot
+
+The weight doesn't has too much variability from what we can see on the box, and since it's horizontal we can somehow see again the last normal distribution and their heavy outliers at the end.
+
+```{r}
+ggplot(cars, aes(x = weight)) +
+  geom_boxplot(fill = "#12003c") +
+  labs(title = "Weight Variable", x = "Weight", y = "Count") +
+  theme_minimal()
+```
+
+- Histogram
+
+The histogram could be also used first to identify the normal distribution of the weight variable.
+
+```{r}
+ggplot(cars, aes(x = weight)) +
+  geom_histogram(fill = "#12003c", bins = 30) +
+  labs(title = "Weight Variable", x = "Weight", y = "Count") +
+  theme_minimal()
+```
+
+- Density plot
+
+This one also shows it but may be unaccurate since it seems more normal that it actually is, but it's better to see how it's skewed to the left.
+
+```{r}
+ggplot(cars, aes(x = weight)) +
+  geom_density(fill = "#12003c") +
+  labs(title = "Weight Variable", x = "Weight", y = "Count") +
+  theme_minimal()
+```
+
+### 2.3 Is the city mileage per gallon different between SUV's and the other types of cars? Get the value for mean and median for city_mpg of SUV's and not-SUV's cars.  
+
+```{r}
+cars %>% 
+  group_by(suv) %>% 
+  summarise(
+    mean = mean(city_mpg, na.rm = TRUE),
+    median = median(city_mpg, na.rm = TRUE)
+)
+```
+
+It seems that when we compare the mean and median of the city mileage per gallon between SUV's and not-SUV's cars, the SUV's have a lower value for both.
+
+### 2.4 Using a faceted histogram, describe the mileage per gallon (mpg) for the vehicles by grouping the suv's and  not suv's vehicles. 
+
+```{r}
+ggplot(cars, aes(x = city_mpg)) +
+  geom_histogram(fill = "#12003c", bins = 30) +
+  labs(title = "City MPG Variable", x = "City MPG", y = "Count") +
+  facet_wrap(~suv) +
+  theme_minimal()
+```
+
+Distribution is similar but there's a huge difference in the number of observations between SUV's and not-SUV's cars on a point that already surpass the peak of the SUV's cars, thought there are more not-SUV's cars with a lower city mileage per gallon than the whole SUV distribution.
+
+### 2.5 Build a side-by-side boxplot to visualize the city miles per galone (city_mpg) depending on the numbers of cilynders of the vehicle (ncyl). 
+
+The only cylinders that are relevant are 4, 6, and 8, since the other ones are not enough to make a comparison.
+
+```{r}
+ggplot(cars, aes(
+  x = as.factor(ncyl), y = city_mpg, fill = as.factor(ncyl)
+)) +
+  geom_boxplot() +
+  labs(
+    title = "City MPG Variable",
+    x = "Number of Cylinders", y = "City MPG"
+  ) +
+  scale_fill_manual(values = okabe_ito) +
+  theme_minimal()
+```
+
+### 2.6 It seems that there are errors in the values for number of cylinders. Filter cars to include only cars with 4, 6, or 8 cylinders and save the result as common_cyl. The %in% operator may prove useful here.
+
+```{r}
+common_cyl <- cars %>% filter(ncyl %in% c(4, 6, 8))
+```
+
+### 2.7 Buil overlapped density plots to show the distribution of miles per gallon depending on the number of cylinders. 
+
+Now we see something similar to what was in the boxplot where the 4 cylinders have a better distribution than the 6 and 8 cylinders, which are more skewed to the left, but incluiding the fact that these ones are less spreaded.
+
+```{r}
+ggplot(common_cyl, aes(x = city_mpg, fill = as.factor(ncyl))) +
+  geom_density(alpha = 0.5) +
+  labs(title = "City MPG Variable", x = "City MPG", y = "Density") +
+  scale_fill_manual(values = okabe_ito) +
+  theme_minimal()
+```
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "A01232580_Session7.rmd",
+#   output_format = rmarkdown::pdf_document(),
+#   output_dir = "./docs/"
+# )
+
+# rmarkdown::render(
+#   "A01232580_Session7.rmd",
+#   output_format = "html_document",
+#   output_dir = "./docs/"
+# )
+```

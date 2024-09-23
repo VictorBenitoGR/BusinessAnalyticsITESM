@@ -1,0 +1,139 @@
+---
+title: "A01232580_Session2"
+author: "Victor Benito Garcia Rocha"
+date: "2024-06-27"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Part 1
+
+## Introduction to data wrangling
+
+```{r}
+# install.packages(tidyverse)
+library(tidyverse)
+
+View(starwars)
+```
+
+```{r}
+names(starwars)
+```
+
+### Filter
+
+%>% equals to "Do this, and then ..."
+
+```{r}
+starwars %>%
+  filter(homeworld == "Tatooine") %>%
+  filter(height > 170)
+```
+
+### Select
+
+```{r}
+starwars %>% select(
+  height, mass, homeworld, species, ends_with("color")
+)
+```
+
+### Group by
+
+```{r}
+starwars %>%
+  group_by(species) %>%
+  count() %>%
+  arrange(desc(n))
+```
+
+# Part 2
+
+### Dealing with NA values
+
+```{r}
+is.na(starwars$species)
+```
+
+```{r}
+starwars[is.na(starwars$species), ]
+```
+
+### Group by (not considering NA)
+
+```{r}
+starwars %>%
+  drop_na(species) %>%
+  group_by(species) %>%
+  count() %>%
+  arrange(desc(n))
+```
+
+### Group by and summarise
+
+Task: find the mean height by species
+
+```{r}
+starwars %>%
+  drop_na(species) %>%
+  group_by(species) %>%
+  summarise(mean_height = mean(height))
+```
+
+### Mutate and case when
+
+Task: Create a new variable in starwars dataset. The name is "size". Get summary of mass first, if mass < 40 classify it as small, if < it should be regular, more than 100 is big.
+
+```{r}
+sw2 <- starwars %>%
+  drop_na(mass) %>%
+  mutate(Size = case_when(
+    mass < 40 ~ "Small",
+    mass < 100 ~ "Regular",
+    mass > 100 ~ "Big"
+  )) %>%
+  select(name, species, Size) %>%
+  arrange(match(Size, c("Small", "Regular", "Big"))) # Notice the custom order
+
+sw2
+```
+
+### Task
+
+- Create a new df of starwars with only human and droids.
+- Classify them as small or tall, depending no their height (< 180 small, >= 180 tall).
+- Create a contingency table that shows how many humans and droid are short and tall. In absolute frequency and relative frequency.
+- Create a mosaic plot to present the information.
+
+```{r}
+starwars3 <- starwars %>%
+  filter(species == "Human" | species == "Droid") %>%
+  mutate(Size = case_when(
+    height < 180 ~ "Small",
+    height >= 180 ~ "Tall"
+  ))
+```
+
+```{r}
+table(starwars3$species, starwars3$Size) %>%
+  prop.table() %>%
+  addmargins()
+```
+
+```{r}
+starwars3 <- starwars3 %>%
+  drop_na(Size)
+```
+
+```{r}
+library(ggplot2)
+library(ggmosaic)
+
+ggplot(starwars3) + geom_mosaic(aes(x = product(species, Size), fill = species))
+```

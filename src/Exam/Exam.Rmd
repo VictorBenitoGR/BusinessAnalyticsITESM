@@ -1,0 +1,50 @@
+---
+title: "OCI Test"
+date: "2024-07-25"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 4
+    toc_collapsed: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+    code_download: TRUE
+    keep_md: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+- **Libraries:**
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(visdat)
+library(knitr)
+```
+
+# <span style="color:#003366">****</span>
+
+```{r}
+
+```
+
+# <span style="color:#003366">**A**</span>
+# <span style="color:#003366">**A**</span>
+# <span style="color:#003366">**A**</span>
+
+```{r, include=FALSE}
+rmarkdown::render(
+  "./src/Exam/QuestionX.Rmd",
+  output_format = "html_document",
+  output_dir = "docs"
+)
+```

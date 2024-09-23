@@ -1,0 +1,81 @@
+---
+title: "Question 8 (Víctor Benito García Rocha)"
+date: "2024-07-25"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 4
+    toc_collapsed: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+    code_download: TRUE
+    keep_md: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# <span style="color:#003366">**Libraries:**</span>
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+```
+
+# <span style="color:#003366">**Problem**</span>
+
+- **Use the "mpg" dataset to recreate the following graph and include an interpretation for it regarding: which type of drive train has the best performance in terms of gasoline consumption? what does the trend line mean?**
+
+- **The title of the graph must have your name to be eligible for grading.**
+
+- **Axis and labels: 3 points**
+
+- **Transparency: 1 point**
+
+- **Trend line with confidence interval: 4 points**
+
+- **Interpretation for the two questions: 4 points (it has to be inside the html)**
+
+- **Scatter plot with colors: 6 points**
+
+## <span style="color:#003366">**Original plot:**</span>
+
+![](C:/Users/HP/Documents/BusinessAnalyticsITESM/assets/ScatterFinal.png)
+
+## <span style="color:#003366">**Plot:**</span>
+
+```{r}
+ggplot(data = mpg, aes(x = displ, y = hwy, color = drv)) +
+  geom_point(size = 3, alpha = 0.5) +
+  geom_smooth(method = "lm", se = TRUE, color = "blue") +
+  labs(
+    title = "Scatterplot by Victor Benito Garcia Rocha",
+    x = "Engine displacement, in litres",
+    y = "highway miles per gallon"
+  ) +
+  theme_linedraw() +
+  theme( # If I don't put this, they appear too black in the html
+    panel.grid.major = element_line(color = "grey"),
+    panel.grid.minor = element_line(color = "grey")
+  )
+```
+
+## <span style="color:#003366">**Interpretation:**</span>
+
+- It seems to imply that there is a trade-off between engine size (dipl) and fuel efficiency on highways (hwy). If you get one with higger displ you should consider to be less fuel-efficient, regardless of the drive type (dry).
+
+```{r, include=FALSE}
+rmarkdown::render(
+  "./src/Exam/Question8.Rmd",
+  output_format = "html_document",
+  output_dir = "documents"
+)
+```

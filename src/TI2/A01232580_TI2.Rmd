@@ -1,0 +1,140 @@
+---
+title: TI2. Data Manipulation Assignment
+author: "Victor Benito Garcia Rocha"
+date: "2024-07-01"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+---
+
+## Instructions
+
+"dplyr" comes with a data set called storms. This is one of the data sets available in the National Hurricane Center (NHC) Data Archive, which is part of the National Oceanic and Atmospheric Administration (NOAA). In particular, the data set storms refers to the Atlantic hurricane database best track data.
+
+The following code loads the dplyr package and glipmses the "storms" data set
+
+```{r}
+library(dplyr)
+glimpse(storms)
+# ?storms
+```
+
+The data includes the positions and attributes of 198 tropical storms, measured every six hours during the lifetime of a storm.
+
+You can find some technical description of storms by taking a peek at its manual (or help) documentation: ?storms
+
+Here’s a full description of all the columns:
+
+- **name:** Storm name
+- **year, month, and day:** Date of report
+- **hour:** Hour of report (in UTC)
+- **lat:** Latitude
+- **long:** Longitude
+- **status:** Storm classification (Tropical Depression, Tropical Storm, or Hurricane)
+- **category:** Saffir-Simpson storm category (estimated from wind speed. -1 = Tropical Depression, 0 = Tropical Storm)
+- **wind:** storm’s maximum sustained wind speed (in knots)
+- **pressure:** Air pressure at the storm’s center (in millibars)
+- **ts_diameter:** Diameter of the area experiencing tropical storm strength winds (34 knots or above)
+- **hu_diameter:** Diameter of the area experiencing hurricane strength winds (64 knots or above)
+
+Answer the following questions:
+
+1) **Use "dplyr" functions/commands to create a table "storm_names_1980s" containing the name and year of storms recorded during the 1980s (i.e. from 1980 to 1989).**
+
+```{r}
+storm_names_1980s <- storms %>%
+  filter(year >= 1980 & year <= 1989) %>%
+  select(name, year)
+head(storm_names_1980s)
+```
+
+1) **Use "dplyr" functions/commands to create a table "storms_per_year" containing the number of storms recorded in each year (i.e. counts or frequencies of storms in each year). This table should contain two columns: year values in the first column, and number of storms in the second column. (HINT: Investigate the distinct() function from dplry)**
+
+```{r}
+storms_per_year <- storms %>%
+  group_by(year) %>%
+  summarise(n = n())
+head(storms_per_year)
+```
+
+3) **Use "dplyr" functions/commands to create a table "storm_records_per_year" containing three columns: 1) name of storm, 2) year of storm, and 3) count for number of records (of the corresponding storm).**
+
+```{r}
+storm_records_per_year <- storms %>%
+  group_by(name, year) %>%
+  summarise(n = n())
+head(storm_records_per_year)
+```
+
+4) **Use "dplyr" functions/commands to display the different (unique) types of storm status. (HINT: Investigate the distinct() function from dplry)**
+
+```{r}
+storms_status <- storms %>%
+  distinct(status)
+head(storms_status)
+```
+
+5) **Use "dplyr" functions/commands to display the different types of storm categories.**
+
+```{r}
+storms_category <- storms %>%
+  distinct(category)
+head(storms_category)
+```
+
+6) **Use "dplyr" functions/commands to create a table "storms_categ5" containing the name and year of those storms of category 5. (HINT: Investigate the distinct() function from dplry)**
+
+```{r}
+storms_categ5 <- storms %>%
+  filter(category == 5) %>%
+  select(name, year) %>%
+  distinct()
+head(storms_categ5)
+```
+
+7) **Use "dplyr" functions/commands to display a table "storms_statistics" showing the status, avg_pressure (average pressure), and avg_wind (average wind speed), for each type of storm category. This table should contain four columns: 1) category, 2) status, 3) avg_pressure, and 4) avg_wind.**
+
+```{r}
+storms_statistics <- storms %>%
+  group_by(category, status) %>%
+  summarise(
+    avg_pressure = mean(pressure, na.rm = TRUE),
+    avg_wind = mean(wind, na.rm = TRUE)
+  )
+head(storms_statistics)
+```
+
+8) **Use "dplyr" functions/commands to create a table "max_wind_per_storm" containing three columns: 1) year of storm, 2) name of storm, and 3) max_wind maximum wind speed record (for that storm).**
+
+```{r}
+max_wind_per_storm <- storms %>%
+  group_by(year, name) %>%
+  summarise(max_wind = max(wind))
+head(max_wind_per_storm)
+```
+
+9) **Use "dplyr" functions/commands to create a table "max_wind_per_year" containing three columns: 1) year of storm, 2) name of storm, and 3) wind maximum wind speed record (for that year). Arrange rows by wind speed in decreasing order.**
+
+```{r}
+max_wind_per_year <- storms %>%
+  group_by(year, name) %>%
+  summarise(wind = max(wind)) %>%
+  arrange(desc(wind))
+head(max_wind_per_year)
+```
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "./src/A01232580_TI2.Rmd",
+#   output_format = rmarkdown::pdf_document(),
+#   output_dir = "./docs/"
+# )
+
+# rmarkdown::render(
+#   "./src/A01232580_TI2.Rmd",
+#   output_format = "html_document",
+#   output_dir = "./docs/"
+# )
+```

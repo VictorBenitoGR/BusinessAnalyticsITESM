@@ -1,0 +1,143 @@
+---
+title: "Question 3 (Víctor Benito García Rocha)"
+date: "2024-07-25"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 4
+    toc_collapsed: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+    code_download: TRUE
+    keep_md: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# <span style="color:#003366">**Libraries:**</span>
+
+```{r}
+library(dplyr)
+library(tidyverse)
+```
+
+# <span style="color:#003366">**Problem 3:**</span>
+
+- **Run the following code:**
+
+```{r}
+library(tidyverse)
+
+data <- data.frame(
+  x = c(1, 2, 3, 4, 5),
+  y = c(6, 7, 8, 9, 10)
+)
+```
+
+- **Add a new variable 'z' which is the sum of 'x' and 'y'**
+
+```{r}
+data <- mutate(data, z = x + y)
+```
+
+- **Compute the 3rd quartile for Z using quantile function. Select the correct answer:**
+
+```{r}
+quantile(data$z, 0.75)
+```
+
+- **Load the library (tidyverse) and work with the dataset "diamonds".**
+
+¿How many premium cut diamonds with a price over $10,000 are there in the dataset? 
+
+```{r}
+library(tidyverse)
+head(diamonds)
+diamonds %>%
+  filter(cut == "Premium" & price > 10000) %>%
+  nrow()
+```
+
+- **Load the library (tidyverse) and work with the dataset "starwars".**
+
+Use group_by and summarise to answer: what is the median height for the Gungan species? drop any NA for species or height before computing it. 
+
+```{r}
+library(tidyverse)
+head(starwars)
+starwars %>%
+  filter(species == "Gungan") %>%
+  drop_na(species, height) %>%
+  summarise(median_height = median(height))
+```
+
+- **Load the library (tidyverse) and work with the dataset "starwars".**
+
+Create one object "st2" that will filter characters of the following species: human, droids and wookies. Build a table that shows the proportion of small or tall characters, based on this rule: if height < 155, it will be small, otherwise, it will be tall. Select the option with the correct code:
+
+```{r}
+st2 <- starwars %>%
+  filter(species=="Human" | species=="Droid" | species == "Wookiee") %>% 
+  mutate(size=case_when(height<155="Small", height>=155="Tall"))
+  table(st2$species,st2$size) %>%
+  prop.table() %>%
+  addmargins()
+```
+
+- **Explore the dataset "mpg" (it is included in base R). You may need functions such as: ?, glimpse, str, etc.**
+
+Select every correct option:
+
+This dataset contains a subset of the fuel economy data that the EPA makes available on https://fueleconomy.gov/. It contains only models which had a new release every year between 1999 and 2008 - this was used as a proxy for the popularity of the car.
+
+```{r}
+# Is there any duplicated row?
+mpg %>% 
+  duplicated() %>% 
+  any()
+# What's the 
+```
+
+displ: engine displacement, in litres
+
+```{r}
+# TRUE
+```
+
+It has 11 observations and 234 variables
+
+```{r}
+# Print TRUE if the statement is correct, FALSE if it is not.
+mpg %>%
+  ncol() == 11
+View(mpg)
+
+mpg %>%
+  nrow() == 234
+```
+
+This dataset contains a subset of the fuel economy data that the EPA makes available on https://fueleconomy.gov/. It contains only models which had a new release every year between 1989 and 2018 - this was used as a proxy for the popularity of the car.
+
+hwy: highway miles per gallon
+
+It has 234 observations and 11 variables
+
+hwy: horse power of the vehicle
+
+displ: type of display of the vehicle
+
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "./src/Exam/Question2.Rmd",
+#   output_format = "html_document",
+#   output_dir = "documents"
+# )
+```

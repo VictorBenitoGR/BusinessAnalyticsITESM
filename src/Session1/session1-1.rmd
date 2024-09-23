@@ -1,0 +1,33 @@
+# *** Session 1 - A01232580
+```{r}
+library(datasets) # Collection of datasets
+library(tidyverse) # Collection of packages for manipulation and visualization
+View(chickwts)
+
+# For the chicken example we have 71 OBSERVATIONS and 2 variables. Weight
+# variable is numerical (quantitative) and Feed is a categorical (qualitative -
+# Factor) variable with 6 levels.
+
+head(chickwts) # Show the first 6 observations
+tail(chickwts) # Shows you the last 6 observations
+glimpse(chickwts) # Quick view of the dataset
+str(chickwts) # Shows the structure of the dataset
+
+# Get the mean and standard deviation of the weight
+mean(chickwts$weight)
+
+?chickwts
+
+# Median
+median(chickwts$weight)
+
+# Standard deviation
+sd(chickwts$weight)
+
+# Boxplot
+boxplot(chickwts$weight ~ chickwts$feed)
+
+table(chickwts$feed)
+
+pie(table(chickwts$feed))
+```

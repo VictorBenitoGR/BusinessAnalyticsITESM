@@ -1,0 +1,84 @@
+---
+title: "Question 8 (Víctor Benito García Rocha)"
+date: "2024-07-25"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 4
+    toc_collapsed: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+    code_download: TRUE
+    keep_md: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# <span style="color:#003366">**Libraries:**</span>
+
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(knitr)
+```
+
+# <span style="color:#003366">**Problem**</span>
+
+- **Recreate the following graph using the dataset "starwars". Submit a html file after you knit your Markdown. The title must show your name.**
+
+- 1. **Labels: 7 points**
+
+- 2. **Barplot with dark theme: 10 points**
+
+- 3. **Correct values for the mass mean: 8 points**
+
+## <span style="color:#003366">**Original plot:**</span>
+
+![](C:/Users/HP/Documents/BusinessAnalyticsITESM/assets/ExamFinalQ2.png)
+
+## <span style="color:#003366">**Plot:**</span>
+
+```{r}
+# Bar plot of y = mean mass of character (kg) and x = home world.
+# With a legend of Home Planet (only Naboo and Tatooine)
+# Theme black
+# X axis home planet 90 degrees
+
+plot <- starwars %>%
+  filter(!is.na(mass), species %in% c("Droid", "Human")) %>%
+  group_by(homeworld, species) %>%
+  summarise(mean_mass = mean(mass, na.rm = TRUE)) %>%
+  filter(homeworld %in% c("Naboo", "Tatooine")) %>%
+  ggplot(aes(x = homeworld, y = mean_mass, fill = homeworld)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  theme_dark() +
+  labs(
+    title = "Barplot by Víctor Benito García Rocha",
+    x = "Home World",
+    y = "Mean Mass",
+    fill = "Home Planet"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
+  ) +
+  facet_wrap(~ species, scales = "free_y")
+
+plot
+# ggsave("./assets/Question10.jpg", plot, width = 10, height = 6)
+```
+
+```{r, include=FALSE}
+rmarkdown::render(
+  "./src/Exam/Question10.Rmd",
+  output_format = "html_document",
+  output_dir = "documents"
+)
+```

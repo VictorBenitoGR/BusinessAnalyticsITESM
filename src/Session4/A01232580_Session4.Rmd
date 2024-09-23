@@ -1,0 +1,111 @@
+---
+title: "A01232580 Session 4"
+author: "Victor Benito Garcia Rocha"
+date: "2024-07-04"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Session 4
+
+```{r warnings = FALSE, message = FALSE}
+library(readxl)
+library(tidyverse)
+```
+
+```{r}
+s4 <- read_xlsx("Session4.xlsx")
+s4
+```
+
+```{r}
+unique(s4$Favourite_fruit)
+```
+
+```{r}
+table(s4$Favourite_fruit)
+```
+
+### 1. Use group_by to explorte the data set, in particular, determine how many different favourite fruits there are
+
+```{r}
+s4 %>%
+  group_by(Favourite_fruit) %>% 
+  count() %>% 
+  arrange(-n)
+```
+
+### 2. Change to lower case all of the fruits' names
+
+```{r}
+s4 %>%
+  mutate(Fav_Fruit=str_to_lower(Favourite_fruit)) %>% 
+  group_by(Fav_Fruit) %>% 
+  count() %>% 
+  arrange(Fav_Fruit)
+```
+
+### 3. Fix the apples and grapes issue
+
+```{r}
+s4 %>% 
+  mutate(Fav_Fruit = str_to_lower(Favourite_fruit)) %>% 
+  mutate(Fav_Fruit = if_else(Fav_Fruit == "apples", "apple", Fav_Fruit)) %>%
+  mutate(Fav_Fruit = if_else(Fav_Fruit == "grapes", "grape", Fav_Fruit)) %>%
+  group_by(Fav_Fruit) %>% 
+  count() %>% 
+  arrange(Fav_Fruit)
+```
+
+### 4. Drop the NA's and sort by descending n
+
+```{r}
+s4a <- s4 %>% 
+  mutate(Fav_Fruit = str_to_lower(Favourite_fruit)) %>% 
+  mutate(Fav_Fruit = if_else(Fav_Fruit == "apples", "apple", Fav_Fruit)) %>%
+  mutate(Fav_Fruit = if_else(Fav_Fruit == "grapes", "grape", Fav_Fruit)) %>%
+  group_by(Fav_Fruit) %>% 
+  drop_na() %>% 
+  count() %>% 
+  arrange(-n)
+
+s4a
+```
+
+### 5. Create a new object (s4a) with the result and build a barpot to describe the dataset
+
+```{r}
+library(ggplot2)
+s4a %>% ggplot(
+  aes(x = Fav_Fruit, y = n)
+) + geom_col(fill = "steelblue") + theme_minimal()
+```
+
+```{r}
+s4a %>% 
+  ggplot(aes(x=forcats::fct_reorder(Fav_Fruit,desc(n)),y=n)) +
+  geom_col(fill="steelblue") +
+  theme_minimal() +
+  labs(x="Favorite fruit",y="Frequency",title="Barplot for favorite fruit") +
+  theme(axis.text.x=element_text(angle=45,hjust=1,vjust=1))
+```
+
+```{r}
+other_fruits <- c("grape", "fig", "kiwi", "strawberry", "watermelon", "banana")
+
+s4a_collapsed <- s4a %>% 
+  mutate(Fav_Fruit_Collapsed=fct_collapse(Fav_Fruit,other=other_fruits)) 
+ 
+s4a_collapsed %>% 
+  ggplot(aes(x=forcats::fct_reorder(Fav_Fruit_Collapsed,desc(n)),y=n)) +
+  geom_col(fill="steelblue") +
+  theme_minimal() +
+  labs(x="Favorite fruit",y="Frequency",title="Barplot for favorite fruit") +
+  theme(axis.text.x=element_text(angle=45, hjust=1, vjust=1))
+```
+

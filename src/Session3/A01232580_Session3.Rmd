@@ -1,0 +1,184 @@
+---
+title: "A01232580_Session3"
+author: "Victor Benito Garcia Rocha"
+date: "2024-07-01"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+# 1. Week 1 quick review
+
+## Finding missing values
+
+```{r}
+library(tidyverse)
+glimpse(starwars)
+names(starwars)
+library(DT)
+sw2 <- starwars %>%
+  select(-c(films,starships,vehicles))
+
+# datatable(data = sw2, caption="Starwars database", filter = "top", class = "cell-border stripe")
+```
+
+```{r}
+nrow(starwars)
+```
+
+## Task 1. Description
+
+```{r}
+starwars_no_na <- starwars %>%
+  select(name, gender, hair_color, height) %>% na.omit()
+starwars_no_na
+```
+
+```{r}
+nrow(starwars) - nrow(starwars_no_na)
+```
+
+
+```{r}
+starwars %>% select(name, gender, hair_color, height) %>% filter(!complete.cases(.))
+```
+
+```{r}
+starwars %>% select(name, gender, hair_color, height) %>%
+  filter(!complete.cases(.)) %>%  drop_na(height) %>%
+  mutate(hair_color = replace_na(hair_color, "none"))
+```
+
+## Task 2
+
+```{r}
+sw2 <- starwars %>%
+  select(name, gender, hair_color, height) %>%
+  drop_na(height) %>%
+  mutate(hair_color = replace_na(hair_color, "none"))
+sw2
+```
+
+```{r}
+library(ggplot2)
+
+sw2 %>% 
+  drop_na(gender) %>%
+  ggplot(aes(x = gender, y = height, fill = gender)) +
+  geom_boxplot() + theme_light()
+```
+
+## Task 3
+
+```{r}
+sales <- c("2,500","2,700","5,200","7,800","9,100","1,900","7,750","8,000","3,500","9000")
+sales.df <- data_frame(sales)
+colnames(sales.df)[1] <- "Total_sales"
+sales.df2 <- sales.df %>%
+  mutate(Total_sales_usd = as.numeric(str_remove(Total_sales, ",")))
+
+class(sales.df2$Total_sales_usd)
+```
+
+```{r}
+mean(sales.df2$Total_sales_usd)
+```
+
+```{r}
+boxplot(sales.df2$Total_sales_usd, col = "lightblue")
+```
+
+## Task 4
+```{r}
+getwd()
+```
+
+```{r}
+library(readxl)
+library(waffle)
+# library(DescTools)
+session1 <- read_excel("Session1S24.xlsx")
+session1
+```
+
+```{r}
+s1part1 <- session1 %>%
+  drop_na(Cat_or_dog) %>% 
+  select(-c("Name of the variable", Commments))
+```
+
+```{r}
+table(s1part1$Cat_or_dog)
+```
+
+```{r}
+pie(table(s1part1$Cat_or_dog))
+```
+
+```{r}
+waffle(table(s1part1$Cat_or_dog), rows = 3, colors = c("black", "gray"))
+```
+
+```{r}
+duplicated(s1part1)
+```
+
+```{r}
+s1part1[duplicated(s1part1), ]
+```
+
+```{r}
+s1part2 <- s1part1[!duplicated(s1part1), ]
+
+s1part2 %>%
+  distinct()
+```
+
+```{r}
+s1part2 %>%
+  count(Name, Age) %>% 
+  filter(n>1)
+```
+
+```{r}
+datatable(data = s1part2,caption="Class students dataset",filter="top",class="cell-border stripe")
+
+s1part2 %>% 
+  count(Name,Age) %>% 
+  filter(n>1)
+```
+
+
+```{r}
+mode <- function(x) {
+  unique_x <- unique(x) # Get unique values
+  tabulated <- tabulate(match(x, unique_x)) # Tabulate occurrences
+  max_freq <- max(tabulated) # Find the maximum frequency
+  modes <- unique_x[tabulated == max_freq] # Find all values with max frequency
+  return(modes)
+}
+
+print(mode(s1part2$Pet_not_get))
+```
+
+```{r}
+print(mode(s1part2$Favourite_fruit))
+```
+
+```{r}
+print(mode(s1part2$least_favourite_food))
+```
+
+
+```{r}
+s1part2$least_favourite_food
+```
+
+```{r}
+s1part2 %>% 
+  ggplot(aes(x=least_favourite_food))+geom_bar()+theme_light()+theme(axis.text.x=element_text(angle=45,hjust=1,vjust=1))
+
+s1part2 %>% 
+  drop_na(Program) %>% 
+  ggplot(aes(x=Program,y=time_social_media))+geom_boxplot()
+```

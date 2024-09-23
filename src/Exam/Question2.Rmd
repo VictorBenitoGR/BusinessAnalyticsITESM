@@ -1,0 +1,79 @@
+---
+title: "Question 2 (Víctor Benito García Rocha)"
+date: "2024-07-25"
+output:
+  pdf_document:
+    latex_engine: xelatex
+  html_document:
+    df_print: paged
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 4
+    toc_collapsed: TRUE
+    number_sections: TRUE
+    theme_united: united
+    highlight: tango
+    code_download: TRUE
+    keep_md: TRUE
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# <span style="color:#003366">**Libraries:**</span>
+
+```{r}
+library(readxl)
+library(dplyr)
+library(tidyverse)
+library(visdat)
+library(knitr)
+```
+
+# <span style="color:#003366">**Create a graph using the mpg dataset. Select any 5 different brands of your choice.**</span>
+
+- **Labels and axis: 4 points**
+
+- **Boxplot with filled boxes: 9 points**
+
+```{r}
+head(mpg)
+```
+
+```{r}
+vis_dat(mpg)
+```
+
+## <span style="color:#003366">**Original plot:**</span>
+
+![](C:/Users/HP/Documents/BusinessAnalyticsITESM/assets/FG3-1.png)
+
+## <span style="color:#003366">**Answer:**</span>
+
+```{r}
+mpg %>%
+  filter(manufacturer %in% c("dodge", "ford", "honda", "nissan", "toyota")) %>%
+  ggplot(aes(x = manufacturer, y = cty, fill = manufacturer)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Boxplot by Víctor Benito García Rocha",
+       x = "Auto Maker",
+       y = "City MPG",
+       fill = "Manufacturer") +
+  theme(
+    plot.title = element_text(color = "black"),
+    axis.title.x = element_text(color = "black"),
+    axis.title.y = element_text(color = "black"),
+    legend.title = element_text(color = "black"),
+    axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)
+  )
+```
+
+```{r, include=FALSE}
+# rmarkdown::render(
+#   "./src/Exam/Question2.Rmd",
+#   output_format = "html_document",
+#   output_dir = "documents"
+# )
+```

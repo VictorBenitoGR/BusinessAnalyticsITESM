@@ -760,6 +760,6 @@ months_mexico_long %>%
 # rmarkdown::render(
 #   "./src/Evidence1/A01232580_Evidence1.rmd",
 #   output_format = "html_document",
-#   output_dir = "./documents/"
+#   output_dir = "./documentss/"
 # )
 ```
